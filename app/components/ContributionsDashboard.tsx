@@ -117,11 +117,11 @@ export default function ContributionsDashboard() {
   // Don't render until client-side hydration is complete
   if (!isClient) {
     return (
-      <div className="w-full max-w-4xl mx-auto p-6">
-        <div className="text-center py-12">
+      <div className="w-full max-w-4xl mx-auto p-4 sm:p-6">
+        <div className="text-center py-8 sm:py-12">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+            <div className="h-6 sm:h-8 bg-gray-200 rounded w-1/3 mx-auto mb-4"></div>
+            <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
           </div>
         </div>
       </div>
@@ -130,13 +130,13 @@ export default function ContributionsDashboard() {
 
   if (totalContributions === 0) {
     return (
-      <div className="w-full max-w-4xl mx-auto p-6">
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">📊</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="w-full max-w-4xl mx-auto p-4 sm:p-6">
+        <div className="text-center py-8 sm:py-12">
+          <div className="text-4xl sm:text-6xl mb-4">📊</div>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
             No Contributions Yet
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm sm:text-base">
             Start contributing data to see your submissions here.
           </p>
         </div>
@@ -145,16 +145,16 @@ export default function ContributionsDashboard() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6">
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-gray-900">
+    <div className="w-full max-w-6xl mx-auto p-4 sm:p-6">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0 mb-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Your Contributions
           </h2>
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3">
             <button
               onClick={exportContributions}
-              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              className="bg-green-500 hover:bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base"
             >
               📥 Export Data
             </button>
@@ -164,7 +164,7 @@ export default function ContributionsDashboard() {
                   clearContributions();
                 }
               }}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              className="bg-red-500 hover:bg-red-600 text-white px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base"
             >
               🗑️ Clear All
             </button>
@@ -172,38 +172,40 @@ export default function ContributionsDashboard() {
         </div>
 
         {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-blue-50 p-6 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-blue-50 p-4 sm:p-6 rounded-lg">
+            <div className="text-xl sm:text-2xl font-bold text-blue-600">
               {totalContributions}
             </div>
-            <div className="text-blue-800">Total Contributions</div>
+            <div className="text-blue-800 text-sm sm:text-base">Total Contributions</div>
           </div>
-          <div className="bg-green-50 p-6 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">
+          <div className="bg-green-50 p-4 sm:p-6 rounded-lg">
+            <div className="text-xl sm:text-2xl font-bold text-green-600">
               {contributions.filter((c: DataContribution) => c.textContent).length}
             </div>
-            <div className="text-green-800">Text Contributions</div>
+            <div className="text-green-800 text-sm sm:text-base">Text Contributions</div>
           </div>
-          <div className="bg-purple-50 p-6 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600">
+          <div className="bg-purple-50 p-4 sm:p-6 rounded-lg">
+            <div className="text-xl sm:text-2xl font-bold text-purple-600">
               {contributions.filter((c: DataContribution) => c.audioBlob).length}
             </div>
-            <div className="text-purple-800">Audio Contributions</div>
+            <div className="text-purple-800 text-sm sm:text-base">Audio Contributions</div>
           </div>
         </div>
 
         {/* Language Filter */}
         {currentLanguage && (
           <div className="mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-lg font-medium text-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+              <span className="text-base sm:text-lg font-medium text-gray-700">
                 Showing contributions for:
               </span>
-              <span className="text-2xl">{currentLanguage.flag}</span>
-              <span className="text-lg font-semibold text-gray-900">
-                {currentLanguage.nativeName} ({currentLanguage.name})
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xl sm:text-2xl">{currentLanguage.flag}</span>
+                <span className="text-base sm:text-lg font-semibold text-gray-900">
+                  {currentLanguage.nativeName} ({currentLanguage.name})
+                </span>
+              </div>
             </div>
           </div>
         )}
@@ -218,19 +220,19 @@ export default function ContributionsDashboard() {
           return (
             <div
               key={contribution.id}
-              className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm"
+              className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm"
             >
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-0 mb-4">
+                <div className="flex-1">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                     {getPromptTitle(contribution.promptId)}
                   </h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-sm text-gray-500">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-1">
+                    <span className="text-xs sm:text-sm text-gray-500">
                       {formatDate(timestamp)}
                     </span>
-                    <span className="text-sm text-gray-400">•</span>
-                    <span className="text-sm text-gray-500">
+                    <span className="hidden sm:inline text-sm text-gray-400">•</span>
+                    <span className="text-xs sm:text-sm text-gray-500">
                       {getLanguageName(contribution.languageCode)}
                     </span>
                   </div>
@@ -252,12 +254,12 @@ export default function ContributionsDashboard() {
               {/* Content Display */}
               {contribution.textContent && (
                 <div className="mb-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-gray-800 whitespace-pre-wrap">
+                  <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                    <p className="text-gray-800 whitespace-pre-wrap text-sm sm:text-base">
                       {contribution.textContent}
                     </p>
                   </div>
-                  <div className="text-sm text-gray-500 mt-2">
+                  <div className="text-xs sm:text-sm text-gray-500 mt-2">
                     {contribution.textContent.length} characters
                   </div>
                 </div>
@@ -265,7 +267,7 @@ export default function ContributionsDashboard() {
 
               {contribution.audioBlob && (
                 <div className="mb-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
                     {getAudioUrl(contribution) ? (
                       <audio 
                         controls 
@@ -278,14 +280,14 @@ export default function ContributionsDashboard() {
                       </audio>
                     ) : (
                       <div className="text-center py-4">
-                        <div className="text-gray-500 mb-2">🎤 Audio Recording</div>
-                        <div className="text-sm text-gray-400">
+                        <div className="text-gray-500 mb-2 text-sm sm:text-base">🎤 Audio Recording</div>
+                        <div className="text-xs sm:text-sm text-gray-400">
                           Audio data is available but cannot be played at the moment.
                         </div>
                       </div>
                     )}
                     {contribution.metadata.recordingDuration && (
-                      <div className="text-sm text-gray-500 mt-2">
+                      <div className="text-xs sm:text-sm text-gray-500 mt-2">
                         Duration: {Math.floor(contribution.metadata.recordingDuration / 60)}:
                         {(contribution.metadata.recordingDuration % 60).toString().padStart(2, '0')}
                       </div>
@@ -310,21 +312,21 @@ export default function ContributionsDashboard() {
 
       {/* Language Summary */}
       {!currentLanguage && totalContributions > 0 && (
-        <div className="mt-8 bg-gray-50 p-6 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="mt-6 sm:mt-8 bg-gray-50 p-4 sm:p-6 rounded-lg">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
             Contributions by Language
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {Array.from(new Set(contributions.map((c: DataContribution) => c.languageCode))).map((langCode: string) => {
               const langContributions = getContributionsByLanguage(langCode);
               const language = getLanguageByCode(langCode);
               return (
                 <div key={langCode} className="text-center">
-                  <div className="text-2xl mb-1">{language?.flag}</div>
-                  <div className="font-medium text-gray-900">
+                  <div className="text-xl sm:text-2xl mb-1">{language?.flag}</div>
+                  <div className="font-medium text-gray-900 text-sm sm:text-base">
                     {language?.nativeName}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-gray-600">
                     {langContributions.length} contributions
                   </div>
                 </div>

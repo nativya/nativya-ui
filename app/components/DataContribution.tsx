@@ -141,15 +141,15 @@ export default function DataContribution({ prompt, onComplete, onBack }: DataCon
   );
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-6">
+    <div className="w-full max-w-2xl mx-auto p-4 sm:p-6">
       {/* Back Button */}
       {onBack && (
         <div className="mb-4">
           <button
             onClick={onBack}
-            className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+            className="flex items-center text-gray-600 hover:text-gray-800 transition-colors text-sm sm:text-base"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Back to Prompts
@@ -158,21 +158,21 @@ export default function DataContribution({ prompt, onComplete, onBack }: DataCon
       )}
 
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
           {prompt.title}
         </h2>
-        <p className="text-gray-600 mb-4">
+        <p className="text-gray-600 mb-4 text-sm sm:text-base">
           {prompt.description}
         </p>
         
         {prompt.examples && (
-          <div className="bg-blue-50 p-4 rounded-lg">
+          <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
             <p className="text-sm font-medium text-blue-900 mb-2">Examples:</p>
             <ul className="text-sm text-blue-800 space-y-1">
               {prompt.examples.map((example, index) => (
                 <li key={index} className="flex items-start">
-                  <span className="text-blue-500 mr-2">•</span>
-                  {example}
+                  <span className="text-blue-500 mr-2 flex-shrink-0">•</span>
+                  <span className="leading-relaxed">{example}</span>
                 </li>
               ))}
             </ul>
@@ -181,10 +181,10 @@ export default function DataContribution({ prompt, onComplete, onBack }: DataCon
       </div>
 
       {/* Input Type Selector */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
         <button
           onClick={() => setInputType('text')}
-          className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
+          className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors text-sm sm:text-base ${
             inputType === 'text'
               ? 'bg-blue-500 text-white'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -194,7 +194,7 @@ export default function DataContribution({ prompt, onComplete, onBack }: DataCon
         </button>
         <button
           onClick={() => setInputType('audio')}
-          className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
+          className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors text-sm sm:text-base ${
             inputType === 'audio'
               ? 'bg-blue-500 text-white'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -214,9 +214,9 @@ export default function DataContribution({ prompt, onComplete, onBack }: DataCon
             value={textContent}
             onChange={(e) => setTextContent(e.target.value)}
             placeholder="Start typing your response..."
-            className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full h-24 sm:h-32 px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
           />
-          <div className="text-sm text-gray-500 mt-2">
+          <div className="text-xs sm:text-sm text-gray-500 mt-2">
             {textContent.length} characters
           </div>
         </div>
@@ -229,7 +229,7 @@ export default function DataContribution({ prompt, onComplete, onBack }: DataCon
             {!isRecording && !audioBlob && (
               <button
                 onClick={startRecording}
-                className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-full text-lg font-medium transition-colors"
+                className="bg-red-500 hover:bg-red-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-medium transition-colors"
               >
                 🎤 Start Recording
               </button>
@@ -237,12 +237,12 @@ export default function DataContribution({ prompt, onComplete, onBack }: DataCon
 
             {isRecording && (
               <div className="space-y-4">
-                <div className="text-2xl font-mono text-red-500">
+                <div className="text-xl sm:text-2xl font-mono text-red-500">
                   {formatTime(recordingTime)}
                 </div>
                 <button
                   onClick={stopRecording}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-full text-lg font-medium transition-colors"
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-medium transition-colors"
                 >
                   ⏹️ Stop Recording
                 </button>
@@ -255,7 +255,7 @@ export default function DataContribution({ prompt, onComplete, onBack }: DataCon
                   <source src={audioUrl} type="audio/wav" />
                   Your browser does not support the audio element.
                 </audio>
-                <div className="text-sm text-gray-600">
+                <div className="text-xs sm:text-sm text-gray-600">
                   Recording duration: {formatTime(recordingTime)}
                 </div>
                 <button
@@ -264,7 +264,7 @@ export default function DataContribution({ prompt, onComplete, onBack }: DataCon
                     setAudioUrl('');
                     setRecordingTime(0);
                   }}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors"
                 >
                   Record Again
                 </button>
@@ -279,7 +279,7 @@ export default function DataContribution({ prompt, onComplete, onBack }: DataCon
         <button
           onClick={handleSubmit}
           disabled={!canSubmit || isSubmitting}
-          className={`px-8 py-3 rounded-lg font-medium transition-colors ${
+          className={`px-6 sm:px-8 py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
             canSubmit && !isSubmitting
               ? 'bg-green-500 hover:bg-green-600 text-white'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
