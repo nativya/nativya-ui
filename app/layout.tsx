@@ -47,7 +47,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Nativya" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         {children}
       </body>
