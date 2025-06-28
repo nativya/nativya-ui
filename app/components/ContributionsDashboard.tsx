@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { getLanguageByCode } from '../data/languages';
 import { DATA_PROMPTS } from '../data/prompts';
 import { formatDate, safeParseDate } from '../lib/utils';
+import { DataContribution } from '../types';
 
 export default function ContributionsDashboard() {
   const { 
@@ -29,7 +30,7 @@ export default function ContributionsDashboard() {
     if (isClient && contributions.length > 0) {
       const newAudioUrls: Record<string, string> = {};
       
-      contributions.forEach((contribution: any) => {
+      contributions.forEach((contribution: DataContribution) => {
         if (contribution.audioBlob && !audioUrls[contribution.id]) {
           try {
             // Convert base64 string back to blob if needed
@@ -74,7 +75,7 @@ export default function ContributionsDashboard() {
         setAudioUrls(prev => ({ ...prev, ...newAudioUrls }));
       }
     }
-  }, [isClient, contributions]);
+  }, [isClient, contributions, audioUrls]);
 
   // Cleanup audio URLs when component unmounts
   useEffect(() => {
@@ -100,7 +101,7 @@ export default function ContributionsDashboard() {
     return language?.nativeName || language?.name || languageCode;
   };
 
-  const getAudioUrl = (contribution: any) => {
+  const getAudioUrl = (contribution: DataContribution): string | undefined => {
     // First try to use the recreated URL from blob
     if (audioUrls[contribution.id]) {
       return audioUrls[contribution.id];
@@ -109,8 +110,8 @@ export default function ContributionsDashboard() {
     if (contribution.audioUrl) {
       return contribution.audioUrl;
     }
-    // If no valid URL is available, return null
-    return null;
+    // If no valid URL is available, return undefined
+    return undefined;
   };
 
   // Don't render until client-side hydration is complete
@@ -180,13 +181,13 @@ export default function ContributionsDashboard() {
           </div>
           <div className="bg-green-50 p-6 rounded-lg">
             <div className="text-2xl font-bold text-green-600">
-              {contributions.filter((c: any) => c.textContent).length}
+              {contributions.filter((c: DataContribution) => c.textContent).length}
             </div>
             <div className="text-green-800">Text Contributions</div>
           </div>
           <div className="bg-purple-50 p-6 rounded-lg">
             <div className="text-2xl font-bold text-purple-600">
-              {contributions.filter((c: any) => c.audioBlob).length}
+              {contributions.filter((c: DataContribution) => c.audioBlob).length}
             </div>
             <div className="text-purple-800">Audio Contributions</div>
           </div>
@@ -210,7 +211,7 @@ export default function ContributionsDashboard() {
 
       {/* Contributions List */}
       <div className="space-y-4">
-        {(currentLanguage ? languageContributions : contributions).map((contribution: any) => {
+        {(currentLanguage ? languageContributions : contributions).map((contribution: DataContribution) => {
           // Safely parse the timestamp
           const timestamp = safeParseDate(contribution.timestamp);
           
@@ -314,7 +315,7 @@ export default function ContributionsDashboard() {
             Contributions by Language
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {Array.from(new Set(contributions.map((c: any) => c.languageCode))).map((langCode: any) => {
+            {Array.from(new Set(contributions.map((c: DataContribution) => c.languageCode))).map((langCode: string) => {
               const langContributions = getContributionsByLanguage(langCode);
               const language = getLanguageByCode(langCode);
               return (

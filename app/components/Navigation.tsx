@@ -136,7 +136,7 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
                       ))
                     ) : (
                       <div className="px-4 py-3 text-sm text-gray-500">
-                        No languages found matching "{searchTerm}"
+                        No languages found matching &quot;{searchTerm}&quot;
                       </div>
                     )}
                   </div>

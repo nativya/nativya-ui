@@ -6,7 +6,6 @@ import Navigation from './components/Navigation';
 import PromptSelector from './components/PromptSelector';
 import DataContribution from './components/DataContribution';
 import ContributionsDashboard from './components/ContributionsDashboard';
-import { type DataContribution as DataContributionType } from './types';
 
 export default function Home() {
   const { currentLanguage, currentPrompt, setCurrentPrompt } = useAppStore();
@@ -52,7 +51,7 @@ export default function Home() {
           <DataContribution 
             prompt={currentPrompt}
             onBack={handleBackToPrompts}
-            onComplete={(contribution) => {
+            onComplete={() => {
               // Show success message and redirect to dashboard
               setCurrentTab('dashboard');
             }}

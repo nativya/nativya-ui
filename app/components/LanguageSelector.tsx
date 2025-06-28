@@ -28,8 +28,8 @@ export default function LanguageSelector({ onLanguageSelect }: LanguageSelectorP
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           Welcome to Nativya
         </h1>
-        <p className="text-lg text-gray-600">
-          Choose your language to start contributing data
+        <p className="text-gray-600 mb-8">
+          Please select your preferred language to start contributing data.
         </p>
       </div>
 
@@ -71,7 +71,7 @@ export default function LanguageSelector({ onLanguageSelect }: LanguageSelectorP
 
       {filteredLanguages.length === 0 && (
         <div className="text-center py-8 text-gray-500">
-          No languages found matching "{searchTerm}"
+          No languages found matching &quot;{searchTerm}&quot;
         </div>
       )}
     </div>

@@ -108,7 +108,7 @@ export const useAppStore = create<AppStore>()(
         const parsed = JSON.parse(str);
         // Convert date strings back to Date objects
         if (parsed.contributions) {
-          parsed.contributions = parsed.contributions.map((contribution: any) => ({
+          parsed.contributions = parsed.contributions.map((contribution: DataContribution) => ({
             ...contribution,
             timestamp: new Date(contribution.timestamp)
           }));

@@ -4,11 +4,7 @@ import { useState } from 'react';
 import { Prompt } from '../types';
 import { useAppStore } from '../store/useAppStore';
 
-interface PromptSelectorProps {
-  // No props needed since navigation is handled automatically
-}
-
-export default function PromptSelector({}: PromptSelectorProps) {
+export default function PromptSelector() {
   const { prompts, currentPrompt, setCurrentPrompt, currentLanguage } = useAppStore();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
