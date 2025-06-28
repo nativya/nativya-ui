@@ -43,9 +43,11 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">
-                Nativya
-              </h1>
+              <img 
+                src="/Nativya_logo.jpg" 
+                alt="Nativya Logo" 
+                className="h-8 object-contain"
+              />
             </div>
           </div>
 
