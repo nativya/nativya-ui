@@ -23,7 +23,7 @@ export interface DataContribution {
   timestamp: Date;
   userId?: string;
   metadata: {
-    deviceInfo: string;
+    // deviceInfo: string;
     recordingDuration?: number;
     textLength?: number;
   };
@@ -43,3 +43,14 @@ export interface AppState {
   isRecording: boolean;
   currentPrompt: Prompt | null;
 } 
+
+export type DriveInfo = {
+  percentUsed: number;
+};
+
+export type UserInfo = {
+  id?: string;
+  name: string;
+  email: string;
+  locale?: string;
+};

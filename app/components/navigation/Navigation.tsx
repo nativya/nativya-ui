@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAppStore } from '../store/useAppStore';
-import { Language } from '../types';
+import { useAppStore } from '../../store/useAppStore';
+import { Language } from '../../types';
+import { useSession } from "next-auth/react";
+import { LogoutButton } from "../login/LogoutButton";
 
 interface NavigationProps {
   currentTab: string;
@@ -11,6 +13,7 @@ interface NavigationProps {
 
 export default function Navigation({ currentTab, onTabChange }: NavigationProps) {
   const { currentLanguage, availableLanguages, setLanguage, getTotalContributions } = useAppStore();
+  const { data: session } = useSession();
   const [isClient, setIsClient] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -95,7 +98,7 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
             ))}
           </div>
 
-          {/* Desktop Language Dropdown */}
+          {/* Desktop Language Dropdown + Logout */}
           <div className="hidden md:flex items-center space-x-4">
             <div className="relative">
               <button
@@ -167,6 +170,7 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
                 </div>
               )}
             </div>
+            {session && <LogoutButton />}
           </div>
 
           {/* Mobile menu button */}
@@ -294,6 +298,11 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
                 </div>
               )}
             </div>
+            {session && (
+              <div className="mt-4">
+                <LogoutButton />
+              </div>
+            )}
           </div>
         </div>
       )}

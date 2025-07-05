@@ -8,12 +8,14 @@ interface AppStore extends AppState {
   // Actions
   setLanguage: (language: Language) => void;
   setCurrentPrompt: (prompt: Prompt | null) => void;
-  addContribution: (contribution: DataContribution) => void;
+  // addContribution: (contribution: DataContribution) => void;
   setIsRecording: (isRecording: boolean) => void;
-  clearContributions: () => void;
-  exportContributions: () => void;
+  // clearContributions: () => void;
+  // exportContributions: () => void;
   getContributionsByLanguage: (languageCode: string) => DataContribution[];
   getTotalContributions: () => number;
+  address: string | null;
+  setAddress: (address: string | null) => void;
 }
 
 export const useAppStore = create<AppStore>()(
@@ -26,6 +28,7 @@ export const useAppStore = create<AppStore>()(
       contributions: [],
       isRecording: false,
       currentPrompt: null,
+      address: null,
 
       // Actions
       setLanguage: (language: Language) => {
@@ -36,47 +39,47 @@ export const useAppStore = create<AppStore>()(
         set({ currentPrompt: prompt });
       },
 
-      addContribution: (contribution: DataContribution) => {
-        // Convert blob to base64 for storage if it exists
-        const processedContribution = { ...contribution };
-        if (contribution.audioBlob && contribution.audioBlob instanceof Blob) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            const base64 = reader.result as string;
-            processedContribution.audioBlob = base64.split(',')[1]; // Remove data URL prefix
-            set((state) => ({
-              contributions: [...state.contributions, processedContribution]
-            }));
-          };
-          reader.readAsDataURL(contribution.audioBlob);
-        } else {
-          set((state) => ({
-            contributions: [...state.contributions, processedContribution]
-          }));
-        }
-      },
+      // addContribution: (contribution: DataContribution) => {
+      //   // Convert blob to base64 for storage if it exists
+      //   const processedContribution = { ...contribution };
+      //   if (contribution.audioBlob && contribution.audioBlob instanceof Blob) {
+      //     const reader = new FileReader();
+      //     reader.onloadend = () => {
+      //       const base64 = reader.result as string;
+      //       processedContribution.audioBlob = base64.split(',')[1]; // Remove data URL prefix
+      //       set((state) => ({
+      //         contributions: [...state.contributions, processedContribution]
+      //       }));
+      //     };
+      //     reader.readAsDataURL(contribution.audioBlob);
+      //   } else {
+      //     set((state) => ({
+      //       contributions: [...state.contributions, processedContribution]
+      //     }));
+      //   }
+      // },
 
       setIsRecording: (isRecording: boolean) => {
         set({ isRecording });
       },
 
-      clearContributions: () => {
-        set({ contributions: [] });
-      },
+      // clearContributions: () => {
+      //   set({ contributions: [] });
+      // },
 
-      exportContributions: () => {
-        const { contributions } = get();
-        const dataStr = JSON.stringify(contributions, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `nativya-contributions-${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      },
+      // exportContributions: () => {
+      //   const { contributions } = get();
+      //   const dataStr = JSON.stringify(contributions, null, 2);
+      //   const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      //   const url = URL.createObjectURL(dataBlob);
+      //   const link = document.createElement('a');
+      //   link.href = url;
+      //   link.download = `nativya-contributions-${new Date().toISOString().split('T')[0]}.json`;
+      //   document.body.appendChild(link);
+      //   link.click();
+      //   document.body.removeChild(link);
+      //   URL.revokeObjectURL(url);
+      // },
 
       getContributionsByLanguage: (languageCode: string) => {
         const { contributions } = get();
@@ -86,6 +89,10 @@ export const useAppStore = create<AppStore>()(
       getTotalContributions: () => {
         const { contributions } = get();
         return contributions.length;
+      },
+
+      setAddress: (address: string | null) => {
+        set({ address });
       }
     }),
     {
@@ -93,7 +100,8 @@ export const useAppStore = create<AppStore>()(
       partialize: (state) => ({
         currentLanguage: state.currentLanguage,
         contributions: state.contributions,
-        currentPrompt: state.currentPrompt
+        currentPrompt: state.currentPrompt,
+        address: state.address, // <-- add this line
       }),
       // Custom serialize/deserialize to handle Date objects properly
       serialize: (state) => {

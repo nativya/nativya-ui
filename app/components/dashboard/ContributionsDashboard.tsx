@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAppStore } from '../store/useAppStore';
-import { getLanguageByCode } from '../data/languages';
-import { DATA_PROMPTS } from '../data/prompts';
-import { formatDate, safeParseDate } from '../lib/utils';
-import { DataContribution } from '../types';
+import { useAppStore } from '../../store/useAppStore';
+import { getLanguageByCode } from '../../data/languages';
+import { DATA_PROMPTS } from '../../data/prompts';
+import { formatDate, safeParseDate } from '../../lib/utils';
+import { DataContribution } from '../../types';
+import { useWallet } from "../../lib/auth/useWallet";
+// import { encryptWithPassphrase } from "../lib/crypto";
 
 export default function ContributionsDashboard() {
   const { 
@@ -19,6 +21,7 @@ export default function ContributionsDashboard() {
   
   const [isClient, setIsClient] = useState(false);
   const [audioUrls, setAudioUrls] = useState<Record<string, string>>({});
+  const { signMessage } = useWallet();
 
   // Ensure client-side rendering to prevent hydration mismatch
   useEffect(() => {
@@ -114,6 +117,36 @@ export default function ContributionsDashboard() {
     return undefined;
   };
 
+  async function handleExport() {
+    try {
+      // 1. Prompt user to sign
+      // const signature = await signMessage("Sign to export your data securely");
+
+      // // 2. Encrypt contributions
+      // const dataStr = JSON.stringify(contributions, null, 2);
+      // const encrypted = await encryptWithPassphrase(dataStr, signature);
+
+      // // 3. Download encrypted file
+      // const dataBlob = new Blob([encrypted], { type: 'text/plain' });
+      // const url = URL.createObjectURL(dataBlob);
+      // const link = document.createElement('a');
+      // link.href = url;
+      // link.download = `nativya-contributions-encrypted-${new Date().toISOString().split('T')[0]}.asc`;
+      // document.body.appendChild(link);
+      // link.click();
+      // document.body.removeChild(link);
+      // URL.revokeObjectURL(url);
+      
+    } catch (err: any) {
+      if (err?.message?.includes("User denied")) {
+        alert("Export cancelled: signature required.");
+      } else {
+        alert("Failed to export data. Please try again.");
+        console.error(err);
+      }
+    }
+  }
+
   // Don't render until client-side hydration is complete
   if (!isClient) {
     return (
@@ -153,7 +186,7 @@ export default function ContributionsDashboard() {
           </h2>
           <div className="flex gap-2 sm:gap-3">
             <button
-              onClick={exportContributions}
+              onClick={handleExport}
               className="bg-green-500 hover:bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base"
             >
               📥 Export Data

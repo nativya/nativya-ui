@@ -1,118 +1,39 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useAppStore } from './store/useAppStore';
-import Navigation from './components/Navigation';
-import PromptSelector from './components/PromptSelector';
-import DataContribution from './components/DataContribution';
-import ContributionsDashboard from './components/ContributionsDashboard';
+import { LoginButton } from "./components/login/LoginButton";
 
-export default function Home() {
-  const { currentLanguage, currentPrompt, setCurrentPrompt } = useAppStore();
-  const [currentTab, setCurrentTab] = useState('prompt');
-  const [isClient, setIsClient] = useState(false);
-
-  // Ensure client-side rendering to prevent hydration mismatch
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Auto-redirect to contribution when prompt is selected
-  useEffect(() => {
-    if (currentPrompt && currentTab === 'prompt') {
-      setCurrentTab('contribute');
-    }
-  }, [currentPrompt, currentTab]);
-
-  const handleBackToPrompts = () => {
-    setCurrentPrompt(null); // Clear the current prompt
-    setCurrentTab('prompt');
-  };
-
-  if (!isClient) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="animate-pulse">
-          <div className="h-16 bg-white border-b border-gray-200"></div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="h-64 bg-white rounded-lg shadow"></div>
-          </div>
+export default function Introduction() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-white px-4">
+      <div className="max-w-2xl w-full bg-white rounded-xl shadow-lg p-8 text-center border border-blue-100">
+        <h1 className="text-3xl sm:text-4xl font-bold text-blue-700 mb-4">
+          Welcome to Regional DataDAO 🚀
+        </h1>
+        <p className="text-lg sm:text-xl text-gray-700 mb-6">
+          <span className="font-semibold text-blue-600">Contribute your voice, stories, and knowledge</span> in your regional language to help build the next generation of AI. <br className="hidden sm:block" />
+          <span className="font-semibold">Your data is the fuel</span> that powers smarter, more inclusive technology for everyone.
+        </p>
+        <div className="mb-6">
+          <span className="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-4 py-2 rounded-full mb-2">
+            Earn rewards for your contributions
+          </span>
+          <p className="text-gray-600 text-base">
+            Join the DataDAO community, contribute text and audio data, and get rewarded for helping preserve and advance regional languages in the AI revolution.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+          <LoginButton />
+          <a
+            href="https://datadao.ai" target="_blank" rel="noopener noreferrer"
+            className="bg-white border border-blue-600 text-blue-700 font-semibold px-6 py-3 rounded-lg transition-colors text-lg hover:bg-blue-50 shadow"
+          >
+            Learn More
+          </a>
+        </div>
+        <div className="mt-8 text-xs text-gray-400">
+          Be a part of the AI revolution. Your data matters.
         </div>
       </div>
-    );
-  }
-
-  const renderContent = () => {
-    switch (currentTab) {
-      case 'prompt':
-        return <PromptSelector />;
-      case 'contribute':
-        return currentLanguage && currentPrompt ? (
-          <DataContribution 
-            prompt={currentPrompt}
-            onBack={handleBackToPrompts}
-            onComplete={() => {
-              // Show success message and redirect to dashboard
-              setCurrentTab('dashboard');
-            }}
-          />
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-600">Please select a prompt first.</p>
-          </div>
-        );
-      case 'dashboard':
-        return <ContributionsDashboard />;
-      default:
-        return <PromptSelector />;
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />
-      
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full">
-        {!currentLanguage ? (
-          <div className="text-center py-8 sm:py-12">
-            <div className="text-4xl sm:text-6xl mb-4">🌍</div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-              Welcome to Nativya
-            </h2>
-            <p className="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base">
-              Please select a language from the navigation bar to get started with contributing data.
-            </p>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 max-w-md mx-auto">
-              <p className="text-xs sm:text-sm text-blue-800">
-                💡 <strong>Tip:</strong> Use the language dropdown in the top-right corner to select your preferred language.
-              </p>
-            </div>
-          </div>
-        ) : (
-          renderContent()
-        )}
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-6 sm:py-8 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-              Nativya - Regional Language Data Collection
-            </h3>
-            <p className="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base">
-              Contributing to the preservation and development of Indian languages through community-driven data collection.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center sm:space-x-6 space-y-2 sm:space-y-0 text-xs sm:text-sm text-gray-500">
-              <span>Supporting 12+ Indian Languages</span>
-              <span className="hidden sm:inline">•</span>
-              <span>Text & Audio Contributions</span>
-              <span className="hidden sm:inline">•</span>
-              <span>Privacy-First Approach</span>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

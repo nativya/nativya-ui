@@ -9,24 +9,31 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/eccrypto": "^1.1.6",
+    "clsx": "^2.1.1",
+    "crypto-js": "^4.2.0",
+    "eccrypto": "^1.1.6",
+    "ethers": "^6.14.4",
+    "googleapis": "^150.0.1",
+    "lucide-react": "^0.460.0",
+    "next": "15.3.4",
+    "next-auth": "^4.24.11",
+    "openpgp": "^6.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.3.4",
-    "lucide-react": "^0.460.0",
     "react-hook-form": "^7.52.1",
-    "zustand": "^4.5.7",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.4"
+    "tailwind-merge": "^2.5.4",
+    "zustand": "^4.5.7"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
-    "@eslint/eslintrc": "^3"
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
