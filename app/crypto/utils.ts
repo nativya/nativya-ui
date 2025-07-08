@@ -32,6 +32,35 @@ export async function clientSideEncrypt(
   return encryptedBlob;
 }
 
+export async function clientSideDecrypt(
+  encryptedBlob: Blob,
+  signature: string
+): Promise<Blob> {
+  try {
+    // Convert Blob to Uint8Array
+    const encryptedBuffer = await encryptedBlob.arrayBuffer();
+    const encryptedData = new Uint8Array(encryptedBuffer);
+    
+    // Create message from encrypted data
+    const message = await openpgp.readMessage({
+      binaryMessage: encryptedData
+    });
+    
+    // Decrypt the message
+    const { data: decrypted } = await openpgp.decrypt({
+      message,
+      passwords: [signature],
+      format: "binary"
+    });
+    
+    // Convert decrypted data back to Blob
+    const decryptedBlob = new Blob([decrypted as Uint8Array]);
+    return decryptedBlob;
+  } catch (error) {
+    throw new Error(`Decryption failed: ${error.message}`);
+  }
+}
+
 /**
  * Encrypts data using a wallet public key
  * @param data The data to encrypt
@@ -120,5 +149,86 @@ export function getEncryptionParameters() {
     ephemeralKey: generatedEphemeralKey,
     ivHex: Buffer.from(generatedIV).toString("hex"),
     ephemeralKeyHex: Buffer.from(generatedEphemeralKey).toString("hex"),
+  };
+}
+
+
+/**
+ * Decrypts data using a wallet private key
+ * @param encryptedHex The encrypted data as a hex string
+ * @param privateKey The wallet private key
+ * @returns The decrypted data as a string
+ */
+export const decryptWithWalletPrivateKey = async (
+  encryptedHex: string,
+  privateKey: string
+): Promise<string> => {
+  try {
+    const eccrypto = await import("eccrypto");
+    
+    // Convert hex string back to buffer
+    const encryptedBuffer = Buffer.from(encryptedHex, "hex");
+    
+    // Extract the components (based on the encryption structure)
+    // IV: 16 bytes, ephemPublicKey: 65 bytes, MAC: 32 bytes
+    // Ciphertext: remaining bytes
+    const iv = encryptedBuffer.slice(0, 16);
+    const ephemPublicKey = encryptedBuffer.slice(16, 81);
+    const macStart = encryptedBuffer.length - 32;
+    const mac = encryptedBuffer.slice(macStart);
+    const ciphertext = encryptedBuffer.slice(81, macStart);
+    
+    // Prepare the encrypted object structure expected by eccrypto
+    const encryptedObj = {
+      iv,
+      ephemPublicKey,
+      ciphertext,
+      mac
+    };
+    
+    // Convert private key to buffer
+    const privateKeyBuffer = Buffer.from(
+      privateKey.startsWith("0x") ? privateKey.slice(2) : privateKey,
+      "hex"
+    );
+    
+    // Decrypt the data
+    const decryptedBuffer = await eccrypto.default.decrypt(
+      privateKeyBuffer,
+      encryptedObj
+    );
+    
+    return decryptedBuffer.toString();
+  } catch (error) {
+    throw new Error(`Wallet decryption failed: ${error.message}`);
+  }
+};
+
+/**
+ * Utility function to validate if a string is a valid hex
+ * @param hex The hex string to validate
+ * @returns boolean indicating if the string is valid hex
+ */
+export function isValidHex(hex: string): boolean {
+  return /^[0-9a-fA-F]+$/.test(hex.replace(/^0x/, ""));
+}
+
+/**
+ * Utility function to extract file information from a VANA file ID
+ * @param fileId The VANA file ID
+ * @returns Object containing timestamp and filename
+ */
+export function parseVanaFileId(fileId: string): {
+  timestamp: number;
+  filename: string;
+} | null {
+  const match = fileId.match(/^vana_submission_(\d+)_(.+)$/);
+  if (!match) {
+    return null;
+  }
+  
+  return {
+    timestamp: parseInt(match[1], 10),
+    filename: match[2]
   };
 }

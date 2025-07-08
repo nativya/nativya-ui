@@ -4,22 +4,22 @@ import { useState } from "react";
 import { Button } from "../ui/Button";
 
 export function LoginButton() {
-  const { data: session, status } = useSession();
+  // const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
-  if (status === "loading") {
-    // Optionally show a loading spinner or nothing while checking session
-    return null;
-  }
+  // if (status === "loading") {
+  //   // Optionally show a loading spinner or nothing while checking session
+  //   return null;
+  // }
 
-  if (session) {
-    // User is logged in
-    return (
-      <Button onClick={() => signOut()} variant="outline" size="lg">
-        Sign out ({session.user?.name || session.user?.email})
-      </Button>
-    );
-  }
+  // if (session) {
+  //   // User is logged in
+  //   return (
+  //     <Button onClick={() => signOut()} variant="outline" size="lg">
+  //       Sign out ({session.user?.name || session.user?.email})
+  //     </Button>
+  //   );
+  // }
 
   // User is not logged in
   const handleLogin = async () => {

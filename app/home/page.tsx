@@ -7,15 +7,6 @@ import DataContribution from '../contribution/DataContribution';
 import ContributionsDashboard from '../components/dashboard/ContributionsDashboard';
 import Navigation from '../components/navigation/Navigation';
 import WalletConnector from '../contribution/utils/WalletConnector';
-import { LoginButton } from '../components/login/LoginButton';
-import { LogoutButton } from '../components/login/LogoutButton';
-// import { useAppStore } from './store/useAppStore';
-// import Navigation from './components/navigation/Navigation';
-// import PromptSelector from './components/PromptSelector';
-// import DataContribution from './contribution/DataContribution';
-// import ContributionsDashboard from './components/dashboard/ContributionsDashboard';
-// import WalletConnector from './contribution/utils/WalletConnector';
-// import { LoginButton } from './components/login/LoginButton';
 
 export default function Home() {
   const { currentLanguage, currentPrompt, setCurrentPrompt } = useAppStore();
@@ -81,7 +72,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />
-      <WalletConnector />
+      {/* <WalletConnector /> */}
       {/* <LogoutButton/> */}
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full">
         {!currentLanguage ? (

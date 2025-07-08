@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Language } from '../types';
-import { useAppStore } from '../store/useAppStore';
+import { Language } from '../../types';
+import { useAppStore } from '../../store/useAppStore';
 
 interface LanguageSelectorProps {
   onLanguageSelect?: (language: Language) => void;

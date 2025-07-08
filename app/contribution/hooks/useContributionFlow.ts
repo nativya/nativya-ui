@@ -2,7 +2,7 @@
 // import { UploadResponse } from "@/lib/google/googleService";
 import { useState } from "react";
 // import { useSignMessage } from "wagmi";
-import {  DriveInfo, UserInfo } from "../../types";
+import {  DataContribution, DriveInfo, UserInfo } from "../../types";
 // import { extractFileIdFromReceipt } from "../utils/fileUtils";
 // import { useAddFile } from "./useAddFile";
 // import { useDataRefinement } from "./useDataRefinement";
@@ -64,7 +64,8 @@ export function useContributionFlow() {
     userInfo: UserInfo,
     driveInfo: DriveInfo,
     // isConnected: boolean,
-    address:string|null
+    address:string|null,
+    contributionData:DataContribution
   ) => {
     console.log("Inside Handle Contribute Data")
     if (!userInfo) {
@@ -82,7 +83,8 @@ export function useContributionFlow() {
       const uploadResult = await executeUploadDataStep(
         userInfo,
         signature,
-        driveInfo
+        driveInfo,
+        contributionData
       );
       if (!uploadResult) return;
 
@@ -139,16 +141,15 @@ export function useContributionFlow() {
   const executeUploadDataStep = async (
     userInfo: UserInfo,
     signature: string,
-    driveInfo: DriveInfo
+    driveInfo: DriveInfo,
+    contributionData: DataContribution
   ) => {
     setCurrentStep(STEPS.UPLOAD_DATA);
-
-    const uploadResult = await uploadData(userInfo, signature, driveInfo);
+    const uploadResult = await uploadData(userInfo, signature, contributionData,driveInfo);
     if (!uploadResult) {
       setError("Failed to upload data to Google Drive");
       return null;
     }
-
     setShareUrl(uploadResult.downloadUrl);
     markStepComplete(STEPS.UPLOAD_DATA);
     return uploadResult;

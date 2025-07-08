@@ -13,7 +13,7 @@ interface AppStore extends AppState {
   // clearContributions: () => void;
   // exportContributions: () => void;
   getContributionsByLanguage: (languageCode: string) => DataContribution[];
-  getTotalContributions: () => number;
+  // getTotalContributions: () => number;
   address: string | null;
   setAddress: (address: string | null) => void;
 }
@@ -86,10 +86,10 @@ export const useAppStore = create<AppStore>()(
         return contributions.filter(c => c.languageCode === languageCode);
       },
 
-      getTotalContributions: () => {
-        const { contributions } = get();
-        return contributions.length;
-      },
+      // getTotalContributions: () => {
+      //   const { contributions } = get();
+      //   return contributions.length;
+      // },
 
       setAddress: (address: string | null) => {
         set({ address });

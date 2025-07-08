@@ -1,373 +1,137 @@
 'use client';
-
-import { useState, useEffect } from 'react';
-import { useAppStore } from '../../store/useAppStore';
-import { getLanguageByCode } from '../../data/languages';
-import { DATA_PROMPTS } from '../../data/prompts';
-import { formatDate, safeParseDate } from '../../lib/utils';
-import { DataContribution } from '../../types';
-import { useWallet } from "../../lib/auth/useWallet";
-// import { encryptWithPassphrase } from "../lib/crypto";
+import { useEffect, useState } from 'react';
+import { clientSideDecrypt } from '@/app/crypto/utils';
+import { Button } from '../ui/Button';
+import { useWallet } from '@/app/lib/auth/useWallet';
 
 export default function ContributionsDashboard() {
-  const { 
-    contributions, 
-    currentLanguage, 
-    exportContributions, 
-    clearContributions,
-    getContributionsByLanguage,
-    getTotalContributions 
-  } = useAppStore();
-  
-  const [isClient, setIsClient] = useState(false);
-  const [audioUrls, setAudioUrls] = useState<Record<string, string>>({});
+  const [files, setFiles] = useState<any[]>([]);
+  const [decrypted, setDecrypted] = useState<Record<string, { blob: Blob; text: string }>>({});
+  const [decryptingId, setDecryptingId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const { signMessage } = useWallet();
+  const SIGN_MESSAGE = "Please sign to retrieve your encryption key";
 
-  // Ensure client-side rendering to prevent hydration mismatch
+  // Fetch contributions on mount
   useEffect(() => {
-    setIsClient(true);
+    setLoading(true);
+    fetch('/api/google/contributions')
+      .then(res => res.json())
+      .then(data => setFiles(data.files || []))
+      .finally(() => setLoading(false));
   }, []);
 
-  // Recreate audio URLs from stored blobs
-  useEffect(() => {
-    if (isClient && contributions.length > 0) {
-      const newAudioUrls: Record<string, string> = {};
-      
-      contributions.forEach((contribution: DataContribution) => {
-        if (contribution.audioBlob && !audioUrls[contribution.id]) {
-          try {
-            // Convert base64 string back to blob if needed
-            let blob: Blob;
-            if (typeof contribution.audioBlob === 'string') {
-              // Validate that it's a proper base64 string
-              if (!contribution.audioBlob || contribution.audioBlob.trim() === '') {
-                console.warn('Empty audioBlob string for contribution:', contribution.id);
-                return;
-              }
-              
-              try {
-                // Handle base64 encoded blob
-                const byteCharacters = atob(contribution.audioBlob);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                  byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                blob = new Blob([byteArray], { type: 'audio/wav' });
-              } catch (base64Error) {
-                console.warn('Invalid base64 string for contribution:', contribution.id, base64Error);
-                return;
-              }
-            } else if (contribution.audioBlob instanceof Blob) {
-              // Handle actual blob object
-              blob = contribution.audioBlob;
-            } else {
-              console.warn('Invalid audioBlob type for contribution:', contribution.id);
-              return;
-            }
-            
-            const url = URL.createObjectURL(blob);
-            newAudioUrls[contribution.id] = url;
-          } catch (error) {
-            console.error('Error processing audio blob for contribution:', contribution.id, error);
-          }
-        }
-      });
-      
-      if (Object.keys(newAudioUrls).length > 0) {
-        setAudioUrls(prev => ({ ...prev, ...newAudioUrls }));
-      }
-    }
-  }, [isClient, contributions, audioUrls]);
-
-  // Cleanup audio URLs when component unmounts
-  useEffect(() => {
-    return () => {
-      Object.values(audioUrls).forEach(url => {
-        URL.revokeObjectURL(url);
-      });
-    };
-  }, [audioUrls]);
-
-  const totalContributions = getTotalContributions();
-  const languageContributions = currentLanguage 
-    ? getContributionsByLanguage(currentLanguage.code)
-    : [];
-
-  const getPromptTitle = (promptId: string) => {
-    const prompt = DATA_PROMPTS.find(p => p.id === promptId);
-    return prompt?.title || 'Unknown Prompt';
-  };
-
-  const getLanguageName = (languageCode: string) => {
-    const language = getLanguageByCode(languageCode);
-    return language?.nativeName || language?.name || languageCode;
-  };
-
-  const getAudioUrl = (contribution: DataContribution): string | undefined => {
-    // First try to use the recreated URL from blob
-    if (audioUrls[contribution.id]) {
-      return audioUrls[contribution.id];
-    }
-    // Fallback to stored audioUrl (might be invalid after page refresh)
-    if (contribution.audioUrl) {
-      return contribution.audioUrl;
-    }
-    // If no valid URL is available, return undefined
-    return undefined;
-  };
-
-  async function handleExport() {
+  // Decrypt handler
+  async function handleDecrypt(file: any) {
+    setDecryptingId(file.id);
     try {
-      // 1. Prompt user to sign
-      // const signature = await signMessage("Sign to export your data securely");
-
-      // // 2. Encrypt contributions
-      // const dataStr = JSON.stringify(contributions, null, 2);
-      // const encrypted = await encryptWithPassphrase(dataStr, signature);
-
-      // // 3. Download encrypted file
-      // const dataBlob = new Blob([encrypted], { type: 'text/plain' });
-      // const url = URL.createObjectURL(dataBlob);
-      // const link = document.createElement('a');
-      // link.href = url;
-      // link.download = `nativya-contributions-encrypted-${new Date().toISOString().split('T')[0]}.asc`;
-      // document.body.appendChild(link);
-      // link.click();
-      // document.body.removeChild(link);
-      // URL.revokeObjectURL(url);
-      
-    } catch (err: any) {
-      if (err?.message?.includes("User denied")) {
-        alert("Export cancelled: signature required.");
-      } else {
-        alert("Failed to export data. Please try again.");
-        console.error(err);
+      // Use wallet signature as passphrase
+      const signature = await signMessage(SIGN_MESSAGE);
+      if (!signature) throw new Error('Signature is required to decrypt.');
+      // Convert base64 to Blob
+      const encryptedBlob = new Blob([
+        Uint8Array.from(atob(file.encryptedData), c => c.charCodeAt(0))
+      ]);
+      // Decrypt using the wallet signature as passphrase
+      const decryptedBlob = await clientSideDecrypt(encryptedBlob, signature);
+      // Try to convert Blob to string (for text/JSON files)
+      let decryptedText = '';
+      try {
+        decryptedText = await decryptedBlob.text();
+      } catch {
+        decryptedText = '';
       }
+      setDecrypted(prev => ({
+        ...prev,
+        [file.id]: { blob: decryptedBlob, text: decryptedText }
+      }));
+    } catch (err: any) {
+      alert('Decryption failed: ' + err.message);
     }
+    setDecryptingId(null);
   }
 
-  // Don't render until client-side hydration is complete
-  if (!isClient) {
-    return (
-      <div className="w-full max-w-4xl mx-auto p-4 sm:p-6">
-        <div className="text-center py-8 sm:py-12">
-          <div className="animate-pulse">
-            <div className="h-6 sm:h-8 bg-gray-200 rounded w-1/3 mx-auto mb-4"></div>
-            <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Loader CSS (inline for demonstration)
+  const loaderStyle: React.CSSProperties = {
+    border: '4px solid #f3f3f3',
+    borderTop: '4px solid #3498db',
+    borderRadius: '50%',
+    width: 32,
+    height: 32,
+    animation: 'spin 1s linear infinite',
+    margin: 'auto',
+  };
 
-  if (totalContributions === 0) {
+  // Add keyframes for spin animation
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+    document.head.appendChild(style);
+    return () => { document.head.removeChild(style); };
+  }, []);
+
+  if (loading) {
     return (
-      <div className="w-full max-w-4xl mx-auto p-4 sm:p-6">
-        <div className="text-center py-8 sm:py-12">
-          <div className="text-4xl sm:text-6xl mb-4">📊</div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-            No Contributions Yet
-          </h2>
-          <p className="text-gray-600 text-sm sm:text-base">
-            Start contributing data to see your submissions here.
-          </p>
-        </div>
+      <div className="max-w-2xl mx-auto p-4 flex justify-center items-center h-40">
+        <div style={loaderStyle} />
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 sm:p-6">
-      <div className="mb-6 sm:mb-8">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0 mb-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Your Contributions
-          </h2>
-          <div className="flex gap-2 sm:gap-3">
-            <button
-              onClick={handleExport}
-              className="bg-green-500 hover:bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base"
-            >
-              📥 Export Data
-            </button>
-            <button
-              onClick={() => {
-                if (confirm('Are you sure you want to clear all contributions? This action cannot be undone.')) {
-                  clearContributions();
-                }
-              }}
-              className="bg-red-500 hover:bg-red-600 text-white px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base"
-            >
-              🗑️ Clear All
-            </button>
-          </div>
-        </div>
-
-        {/* Statistics */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <div className="bg-blue-50 p-4 sm:p-6 rounded-lg">
-            <div className="text-xl sm:text-2xl font-bold text-blue-600">
-              {totalContributions}
-            </div>
-            <div className="text-blue-800 text-sm sm:text-base">Total Contributions</div>
-          </div>
-          <div className="bg-green-50 p-4 sm:p-6 rounded-lg">
-            <div className="text-xl sm:text-2xl font-bold text-green-600">
-              {contributions.filter((c: DataContribution) => c.textContent).length}
-            </div>
-            <div className="text-green-800 text-sm sm:text-base">Text Contributions</div>
-          </div>
-          <div className="bg-purple-50 p-4 sm:p-6 rounded-lg">
-            <div className="text-xl sm:text-2xl font-bold text-purple-600">
-              {contributions.filter((c: DataContribution) => c.audioBlob).length}
-            </div>
-            <div className="text-purple-800 text-sm sm:text-base">Audio Contributions</div>
-          </div>
-        </div>
-
-        {/* Language Filter */}
-        {currentLanguage && (
-          <div className="mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
-              <span className="text-base sm:text-lg font-medium text-gray-700">
-                Showing contributions for:
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="text-xl sm:text-2xl">{currentLanguage.flag}</span>
-                <span className="text-base sm:text-lg font-semibold text-gray-900">
-                  {currentLanguage.nativeName} ({currentLanguage.name})
-                </span>
+    <div className="max-w-2xl mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-6">Your Encrypted Contributions</h2>
+      <ul className="space-y-6">
+        {files.map(file => {
+          // Prepare decrypted data display if available
+          let decryptedDisplay = null;
+          if (decrypted[file.id]) {
+            let displayText = decrypted[file.id].text;
+            try {
+              displayText = JSON.stringify(JSON.parse(displayText), null, 2);
+            } catch {}
+            decryptedDisplay = (
+              <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 shadow-inner">
+                <div className="flex items-center mb-2">
+                  <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2l4 -4" />
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  </svg>
+                  <span className="font-semibold text-green-700">Decrypted Data</span>
+                </div>
+                {displayText ? (
+                  <pre className="bg-white border border-gray-200 rounded p-3 text-sm font-mono text-gray-800 overflow-x-auto whitespace-pre-wrap">
+                    {displayText}
+                  </pre>
+                ) : (
+                  <a
+                    href={URL.createObjectURL(decrypted[file.id].blob)}
+                    download={file.name.replace(/^encrypted_/, 'decrypted_')}
+                    className="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                  >
+                    Download Decrypted File
+                  </a>
+                )}
               </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Contributions List */}
-      <div className="space-y-4">
-        {(currentLanguage ? languageContributions : contributions).map((contribution: DataContribution) => {
-          // Safely parse the timestamp
-          const timestamp = safeParseDate(contribution.timestamp);
-          
+            );
+          }
           return (
-            <div
-              key={contribution.id}
-              className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm"
-            >
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-0 mb-4">
-                <div className="flex-1">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                    {getPromptTitle(contribution.promptId)}
-                  </h3>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-1">
-                    <span className="text-xs sm:text-sm text-gray-500">
-                      {formatDate(timestamp)}
-                    </span>
-                    <span className="hidden sm:inline text-sm text-gray-400">•</span>
-                    <span className="text-xs sm:text-sm text-gray-500">
-                      {getLanguageName(contribution.languageCode)}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {contribution.textContent && (
-                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                      📝 Text
-                    </span>
-                  )}
-                  {contribution.audioBlob && (
-                    <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-                      🎤 Audio
-                    </span>
-                  )}
-                </div>
+            <li key={file.id} className="border rounded-lg p-4 bg-white shadow">
+              <div className="mb-2 font-semibold">{file.name}</div>
+              <div className="text-xs text-gray-500 mb-2">
+                Uploaded: {new Date(file.createdTime).toLocaleString()}
               </div>
-
-              {/* Content Display */}
-              {contribution.textContent && (
-                <div className="mb-4">
-                  <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
-                    <p className="text-gray-800 whitespace-pre-wrap text-sm sm:text-base">
-                      {contribution.textContent}
-                    </p>
-                  </div>
-                  <div className="text-xs sm:text-sm text-gray-500 mt-2">
-                    {contribution.textContent.length} characters
-                  </div>
-                </div>
+              {decryptedDisplay ? (
+                decryptedDisplay
+              ) : (
+                <Button onClick={() => handleDecrypt(file)} disabled={decryptingId === file.id}>
+                  {decryptingId === file.id ? 'Decrypting...' : 'Decrypt'}
+                </Button>
               )}
-
-              {contribution.audioBlob && (
-                <div className="mb-4">
-                  <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
-                    {getAudioUrl(contribution) ? (
-                      <audio 
-                        controls 
-                        className="w-full"
-                        preload="metadata"
-                        controlsList="nodownload"
-                      >
-                        <source src={getAudioUrl(contribution)} type="audio/wav" />
-                        Your browser does not support the audio element.
-                      </audio>
-                    ) : (
-                      <div className="text-center py-4">
-                        <div className="text-gray-500 mb-2 text-sm sm:text-base">🎤 Audio Recording</div>
-                        <div className="text-xs sm:text-sm text-gray-400">
-                          Audio data is available but cannot be played at the moment.
-                        </div>
-                      </div>
-                    )}
-                    {contribution.metadata.recordingDuration && (
-                      <div className="text-xs sm:text-sm text-gray-500 mt-2">
-                        Duration: {Math.floor(contribution.metadata.recordingDuration / 60)}:
-                        {(contribution.metadata.recordingDuration % 60).toString().padStart(2, '0')}
-                      </div>
-                    )}
-                    {getAudioUrl(contribution) && (
-                      <div className="text-xs text-gray-500 mt-2">
-                        💡 Click the play button to listen to your audio recording
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Metadata */}
-              <div className="text-xs text-gray-400 border-t pt-3">
-                <div>Device: {contribution.metadata.deviceInfo}</div>
-              </div>
-            </div>
+            </li>
           );
         })}
-      </div>
-
-      {/* Language Summary */}
-      {!currentLanguage && totalContributions > 0 && (
-        <div className="mt-6 sm:mt-8 bg-gray-50 p-4 sm:p-6 rounded-lg">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
-            Contributions by Language
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {Array.from(new Set(contributions.map((c: DataContribution) => c.languageCode))).map((langCode: string) => {
-              const langContributions = getContributionsByLanguage(langCode);
-              const language = getLanguageByCode(langCode);
-              return (
-                <div key={langCode} className="text-center">
-                  <div className="text-xl sm:text-2xl mb-1">{language?.flag}</div>
-                  <div className="font-medium text-gray-900 text-sm sm:text-base">
-                    {language?.nativeName}
-                  </div>
-                  <div className="text-xs sm:text-sm text-gray-600">
-                    {langContributions.length} contributions
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      </ul>
     </div>
   );
 } 

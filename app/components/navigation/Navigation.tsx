@@ -12,13 +12,13 @@ interface NavigationProps {
 }
 
 export default function Navigation({ currentTab, onTabChange }: NavigationProps) {
-  const { currentLanguage, availableLanguages, setLanguage, getTotalContributions } = useAppStore();
+  const { currentLanguage, availableLanguages, setLanguage } = useAppStore();
   const { data: session } = useSession();
   const [isClient, setIsClient] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const totalContributions = getTotalContributions();
+  // const totalContributions = getTotalContributions();
 
   // Ensure client-side rendering to prevent hydration mismatch
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
 
   const tabs = [
     { id: 'prompt', label: '📝 Prompts', icon: '📝' },
-    { id: 'dashboard', label: '📊 Dashboard', icon: '📊', badge: totalContributions }
+    { id: 'dashboard', label: '📊 Dashboard', icon: '📊' }
   ];
 
   const filteredLanguages = availableLanguages.filter((lang: Language) =>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { uploadUserData, UploadResponse } from "@/app/lib/google/googleService";
 import { useSession } from "next-auth/react";
-import { DriveInfo, UserInfo } from "../../types";
+import { DataContribution, DriveInfo, UserInfo } from "../../types";
 
 /**
  * Hook for uploading and encrypting data
@@ -16,7 +16,8 @@ export function useDataUpload() {
   const uploadData = async (
     userInfo: UserInfo,
     signature: string,
-    driveInfo?: DriveInfo
+    contributionData:DataContribution,
+    driveInfo?: DriveInfo,
   ): Promise<UploadResponse | null> => {
     setIsUploading(true);
 
@@ -30,7 +31,8 @@ export function useDataUpload() {
         userInfo,
         signature,
         session.accessToken as string,
-        driveInfo
+        contributionData,
+        driveInfo,
       );
 
       return result;

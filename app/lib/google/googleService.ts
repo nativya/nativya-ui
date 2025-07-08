@@ -2,6 +2,7 @@
  * Google Drive service for client-side file operations
  */
 import { DriveInfo, UserInfo } from "@/app/types";
+import { DataContribution } from "@/app/types";
 import { clientSideEncrypt, formatVanaFileId } from "../../crypto/utils";
 
 export interface UploadResponse {
@@ -18,10 +19,12 @@ export interface UploadResponse {
  * 3. Set permissions
  * 4. Generate and return all necessary URLs
  */
+
 export const uploadUserData = async (
   userInfo: UserInfo,
   signature: string,
   accessToken: string,
+  contributionData: DataContribution,
   driveInfo?: DriveInfo
 ): Promise<UploadResponse> => {
   // Prepare data package
@@ -44,6 +47,7 @@ export const uploadUserData = async (
       collectionDate: new Date().toISOString(),
       dataType: "profile",
     },
+    data:contributionData
   };
 
   const fileString = JSON.stringify(dataPackage);

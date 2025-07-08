@@ -1,8 +1,39 @@
 "use client";
 
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { LoginButton } from "./components/login/LoginButton";
 
 export default function Introduction() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      router.push("/home");
+    }
+  }, [session, status, router]);
+
+  // Show loading while checking authentication status
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-white px-4">
+        <div className="max-w-2xl w-full bg-white rounded-xl shadow-lg p-8 text-center border border-blue-100">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render the intro page if user is authenticated (they'll be redirected)
+  if (status === "authenticated") {
+    return null;
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-white px-4">
       <div className="max-w-2xl w-full bg-white rounded-xl shadow-lg p-8 text-center border border-blue-100">
