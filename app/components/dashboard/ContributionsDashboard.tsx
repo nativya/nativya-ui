@@ -86,9 +86,28 @@ export default function ContributionsDashboard() {
           // Prepare decrypted data display if available
           let decryptedDisplay = null;
           if (decrypted[file.id]) {
-            let displayText = decrypted[file.id].text;
+            let displayData = null;
+            let audioUrl = null;
             try {
-              displayText = JSON.stringify(JSON.parse(displayText), null, 2);
+              const parsed = JSON.parse(decrypted[file.id].text);
+              if (parsed && parsed.data !== undefined) {
+                // If audioData exists, create a URL for it
+                if (parsed.data.audioData && parsed.data.audioData.base64 && parsed.data.audioData.mimeType) {
+                  const { base64, mimeType } = parsed.data.audioData;
+                  // Convert base64 to Blob
+                  const byteCharacters = atob(base64);
+                  const byteNumbers = new Array(byteCharacters.length);
+                  for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                  }
+                  const byteArray = new Uint8Array(byteNumbers);
+                  const audioBlob = new Blob([byteArray], { type: mimeType });
+                  audioUrl = URL.createObjectURL(audioBlob);
+                }
+                // Exclude audioData from displayData
+                const { audioData, ...restData } = parsed.data;
+                displayData = JSON.stringify(restData, null, 2);
+              }
             } catch {}
             decryptedDisplay = (
               <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 shadow-inner">
@@ -97,21 +116,18 @@ export default function ContributionsDashboard() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2l4 -4" />
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
                   </svg>
-                  <span className="font-semibold text-green-700">Decrypted Data</span>
+                  <span className="font-semibold text-green-700">Decrypted Data Field</span>
                 </div>
-                {displayText ? (
-                  <pre className="bg-white border border-gray-200 rounded p-3 text-sm font-mono text-gray-800 overflow-x-auto whitespace-pre-wrap">
-                    {displayText}
-                  </pre>
-                ) : (
-                  <a
-                    href={URL.createObjectURL(decrypted[file.id].blob)}
-                    download={file.name.replace(/^encrypted_/, 'decrypted_')}
-                    className="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                  >
-                    Download Decrypted File
-                  </a>
+                {audioUrl && (
+                  <audio controls src={audioUrl} className="my-2" />
                 )}
+                {displayData && displayData !== '{}' ? (
+                  <pre className="bg-white border border-gray-200 rounded p-3 text-sm font-mono text-gray-800 overflow-x-auto whitespace-pre-wrap">
+                    {displayData}
+                  </pre>
+                ) : !audioUrl ? (
+                  <div className="text-red-600">No <code>data</code> field found in decrypted content.</div>
+                ) : null}
               </div>
             );
           }
