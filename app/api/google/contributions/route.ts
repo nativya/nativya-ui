@@ -5,7 +5,7 @@ import { google } from "googleapis";
 import type { Session } from "next-auth";
 
 // Helper to find the folder ID for 'VANA DLP Data'
-async function getVanaDlpFolderId(drive, token) {
+async function getVanaDlpFolderId(drive) {
   const res = await drive.files.list({
     q: "name = 'VANA DLP Data' and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
     fields: "files(id, name)",
@@ -32,7 +32,7 @@ export async function GET() {
     const drive = google.drive({ version: "v3", auth });
 
     // Find the 'VANA DLP Data' folder
-    const folderId = await getVanaDlpFolderId(drive, session.accessToken);
+    const folderId = await getVanaDlpFolderId(drive);
     if (!folderId) {
       return NextResponse.json({ files: [] }); // No folder, no files
     }
@@ -52,7 +52,7 @@ export async function GET() {
           { fileId: String(file.id), alt: "media" },
           { responseType: "arraybuffer" }
         );
-        // @ts-ignore: res.data is the arraybuffer
+        // @ts-expect-error: res.data is the arraybuffer
         return {
           id: file.id,
           name: file.name,

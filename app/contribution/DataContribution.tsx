@@ -1,6 +1,6 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
-import { Prompt, type DataContribution as DataContributionType } from '../types';
+import { useState, useEffect } from 'react';
+import { AudioData, Prompt, type DataContribution as DataContributionType } from '../types';
 import { useAppStore } from '../store/useAppStore';
 import { useWallet } from "../lib/auth/useWallet";
 import InputTypeSelector from './ui/InputTypeSelector';
@@ -48,11 +48,6 @@ export default function DataContribution({ prompt, onComplete, onBack }: DataCon
 
   const {
     isSuccess,
-    error,
-    currentStep,
-    completedSteps,
-    shareUrl,
-    isLoading,
     handleContributeData,
     resetFlow,
   } = useContributionFlow();

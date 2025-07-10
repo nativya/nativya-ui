@@ -2,9 +2,15 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import { useAppStore } from "../../store/useAppStore";
 
+interface EthereumProvider {
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+  on: (event: string, callback: (...args: unknown[]) => void) => void;
+  removeListener: (event: string, callback: (...args: unknown[]) => void) => void;
+}
+
 declare global {
   interface Window {
-    ethereum?: any;
+    ethereum?: EthereumProvider;
   }
 }
 
@@ -21,8 +27,9 @@ export function useWallet() {
       const accounts = await provider.send("eth_requestAccounts", []);
       setAddress(accounts[0]);
       return accounts[0];
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      setError(errorMessage);
       throw err;
     }
   }
@@ -35,8 +42,9 @@ export function useWallet() {
       const signer = await provider.getSigner();
       const signature = await signer.signMessage(message);
       return signature;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      setError(errorMessage);
       throw err;
     }
   }

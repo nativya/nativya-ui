@@ -5,7 +5,7 @@ import { Button } from '../ui/Button';
 import { useWallet } from '@/app/lib/auth/useWallet';
 
 export default function ContributionsDashboard() {
-  const [files, setFiles] = useState<any[]>([]);
+  const [files, setFiles] = useState<Record<string, any>[]>([]);
   const [decrypted, setDecrypted] = useState<Record<string, { blob: Blob; text: string }>>({});
   const [decryptingId, setDecryptingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -22,7 +22,7 @@ export default function ContributionsDashboard() {
   }, []);
 
   // Decrypt handler
-  async function handleDecrypt(file: any) {
+  async function handleDecrypt(file: Record<string, any>) {
     setDecryptingId(file.id);
     try {
       // Use wallet signature as passphrase
