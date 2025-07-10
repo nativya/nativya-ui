@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { AudioData, Prompt, type DataContribution as DataContributionType } from '../types';
+import { AudioData, Prompt } from '../types';
 import { useAppStore } from '../store/useAppStore';
 import { useWallet } from "../lib/auth/useWallet";
 import InputTypeSelector from './ui/InputTypeSelector';
