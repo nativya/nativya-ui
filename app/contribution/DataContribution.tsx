@@ -16,7 +16,6 @@ import WalletConnector from './utils/WalletConnector';
 
 interface DataContributionProps {
   prompt: Prompt;
-  onComplete?: (contribution: DataContributionType) => void;
   onBack?: () => void;
 }
 
@@ -34,7 +33,7 @@ const convertBlobToBase64 = (blob: Blob): Promise<string> => {
   });
 };
 
-export default function DataContribution({ prompt, onComplete, onBack }: DataContributionProps) {
+export default function DataContribution({ prompt, onBack }: DataContributionProps) {
   const { currentLanguage } = useAppStore();
   const [inputType, setInputType] = useState<'text' | 'audio'>('text');
   const [textContent, setTextContent] = useState('');
@@ -53,7 +52,7 @@ export default function DataContribution({ prompt, onComplete, onBack }: DataCon
   } = useContributionFlow();
 
   useEffect(() => {
-    console.log("Wallet address in DataContribution:", address);
+    // console.log("Wallet address in DataContribution:", address);
     return () => {
       if (audioUrl) {
         URL.revokeObjectURL(audioUrl);

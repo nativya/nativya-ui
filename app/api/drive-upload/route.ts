@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { encryptedContent, metadata } = await req.json();
+  const { /* encryptedContent, metadata */ } = await req.json();
 
   try {
     // const response = await uploadToGoogleDrive({

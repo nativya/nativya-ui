@@ -5,6 +5,7 @@ import { useAppStore } from '../../store/useAppStore';
 import { Language } from '../../types';
 import { useSession } from "next-auth/react";
 import { LogoutButton } from "../login/LogoutButton";
+import Image from 'next/image';
 
 interface NavigationProps {
   currentTab: string;
@@ -67,10 +68,12 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <img 
+              <Image 
                 src="/Nativya_logo.jpg" 
                 alt="Nativya Logo" 
                 className="h-8 w-auto object-contain"
+                width={32}
+                height={32}
               />
             </div>
           </div>

@@ -6,7 +6,6 @@ import PromptSelector from '../components/PromptSelector';
 import DataContribution from '../contribution/DataContribution';
 import ContributionsDashboard from '../components/dashboard/ContributionsDashboard';
 import Navigation from '../components/navigation/Navigation';
-import WalletConnector from '../contribution/utils/WalletConnector';
 
 export default function Home() {
   const { currentLanguage, currentPrompt, setCurrentPrompt } = useAppStore();

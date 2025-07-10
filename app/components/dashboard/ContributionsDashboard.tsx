@@ -5,7 +5,7 @@ import { Button } from '../ui/Button';
 import { useWallet } from '@/app/lib/auth/useWallet';
 
 export default function ContributionsDashboard() {
-  const [files, setFiles] = useState<Record<string, any>[]>([]);
+  const [files, setFiles] = useState<Record<string, unknown>[]>([]);
   const [decrypted, setDecrypted] = useState<Record<string, { blob: Blob; text: string }>>({});
   const [decryptingId, setDecryptingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -22,15 +22,15 @@ export default function ContributionsDashboard() {
   }, []);
 
   // Decrypt handler
-  async function handleDecrypt(file: Record<string, any>) {
-    setDecryptingId(file.id);
+  async function handleDecrypt(file: Record<string, unknown>) {
+    setDecryptingId(file.id as string);
     try {
       // Use wallet signature as passphrase
       const signature = await signMessage(SIGN_MESSAGE);
       if (!signature) throw new Error('Signature is required to decrypt.');
       // Convert base64 to Blob
       const encryptedBlob = new Blob([
-        Uint8Array.from(atob(file.encryptedData), c => c.charCodeAt(0))
+        Uint8Array.from(atob(file.encryptedData as string), c => c.charCodeAt(0))
       ]);
       // Decrypt using the wallet signature as passphrase
       const decryptedBlob = await clientSideDecrypt(encryptedBlob, signature);
@@ -43,10 +43,10 @@ export default function ContributionsDashboard() {
       }
       setDecrypted(prev => ({
         ...prev,
-        [file.id]: { blob: decryptedBlob, text: decryptedText }
+        [file.id as string]: { blob: decryptedBlob, text: decryptedText }
       }));
-    } catch (err: any) {
-      alert('Decryption failed: ' + err.message);
+    } catch (err) {
+      alert('Decryption failed: ' + (err as Error).message);
     }
     setDecryptingId(null);
   }
@@ -85,11 +85,11 @@ export default function ContributionsDashboard() {
         {files.map(file => {
           // Prepare decrypted data display if available
           let decryptedDisplay = null;
-          if (decrypted[file.id]) {
+          if (decrypted[file.id as string]) {
             let displayData = null;
             let audioUrl = null;
             try {
-              const parsed = JSON.parse(decrypted[file.id].text);
+              const parsed = JSON.parse(decrypted[file.id as string].text);
               if (parsed && parsed.data !== undefined) {
                 // If audioData exists, create a URL for it
                 if (parsed.data.audioData && parsed.data.audioData.base64 && parsed.data.audioData.mimeType) {
@@ -140,8 +140,8 @@ export default function ContributionsDashboard() {
               {decryptedDisplay ? (
                 decryptedDisplay
               ) : (
-                <Button onClick={() => handleDecrypt(file)} disabled={decryptingId === file.id}>
-                  {decryptingId === file.id ? 'Decrypting...' : 'Decrypt'}
+                <Button onClick={() => handleDecrypt(file)} disabled={decryptingId === file.id as string}>
+                  {decryptingId === file.id as string ? 'Decrypting...' : 'Decrypt'}
                 </Button>
               )}
             </li>
