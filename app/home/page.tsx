@@ -51,10 +51,10 @@ export default function Home() {
           <DataContribution
             prompt={currentPrompt}
             onBack={handleBackToPrompts}
-            onComplete={() => {
-              // Show success message and redirect to dashboard
-              setCurrentTab('dashboard');
-            }}
+            // onComplete={() => {
+            //   // Show success message and redirect to dashboard
+            //   setCurrentTab('dashboard');
+            // }}
           />
         ) : (
           <div className="text-center py-12">

@@ -3,9 +3,20 @@ import { useEffect, useState } from 'react';
 import { clientSideDecrypt } from '@/app/crypto/utils';
 import { Button } from '../ui/Button';
 import { useWallet } from '@/app/lib/auth/useWallet';
+import { AudioData } from '@/app/types';
+
+// Define the type for files fetched from the API
+export interface ContributionFile {
+  id: string;
+  name: string;
+  createdTime: string;
+  mimeType: string;
+  size?: string;
+  encryptedData: string;
+}
 
 export default function ContributionsDashboard() {
-  const [files, setFiles] = useState<Record<string, unknown>[]>([]);
+  const [files, setFiles] = useState<ContributionFile[]>([]);
   const [decrypted, setDecrypted] = useState<Record<string, { blob: Blob; text: string }>>({});
   const [decryptingId, setDecryptingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -18,19 +29,22 @@ export default function ContributionsDashboard() {
     fetch('/api/google/contributions')
       .then(res => res.json())
       .then(data => setFiles(data.files || []))
-      .finally(() => setLoading(false));
+      .finally(() =>{ 
+        console.log(files)
+        setLoading(false)
+      });
   }, []);
 
   // Decrypt handler
-  async function handleDecrypt(file: Record<string, unknown>) {
-    setDecryptingId(file.id as string);
+  async function handleDecrypt(file: ContributionFile) {
+    setDecryptingId(file.id);
     try {
       // Use wallet signature as passphrase
       const signature = await signMessage(SIGN_MESSAGE);
       if (!signature) throw new Error('Signature is required to decrypt.');
       // Convert base64 to Blob
       const encryptedBlob = new Blob([
-        Uint8Array.from(atob(file.encryptedData as string), c => c.charCodeAt(0))
+        Uint8Array.from(atob(file.encryptedData), c => c.charCodeAt(0))
       ]);
       // Decrypt using the wallet signature as passphrase
       const decryptedBlob = await clientSideDecrypt(encryptedBlob, signature);
@@ -43,13 +57,15 @@ export default function ContributionsDashboard() {
       }
       setDecrypted(prev => ({
         ...prev,
-        [file.id as string]: { blob: decryptedBlob, text: decryptedText }
+        [file.id]: { blob: decryptedBlob, text: decryptedText }
       }));
     } catch (err) {
       alert('Decryption failed: ' + (err as Error).message);
     }
     setDecryptingId(null);
   }
+
+  const removeFunc=(audioData:AudioData)=>{return audioData;}
 
   // Loader CSS (inline for demonstration)
   const loaderStyle: React.CSSProperties = {
@@ -85,11 +101,11 @@ export default function ContributionsDashboard() {
         {files.map(file => {
           // Prepare decrypted data display if available
           let decryptedDisplay = null;
-          if (decrypted[file.id as string]) {
+          if (decrypted[file.id]) {
             let displayData = null;
             let audioUrl = null;
             try {
-              const parsed = JSON.parse(decrypted[file.id as string].text);
+              const parsed = JSON.parse(decrypted[file.id].text);
               if (parsed && parsed.data !== undefined) {
                 // If audioData exists, create a URL for it
                 if (parsed.data.audioData && parsed.data.audioData.base64 && parsed.data.audioData.mimeType) {
@@ -105,8 +121,9 @@ export default function ContributionsDashboard() {
                   audioUrl = URL.createObjectURL(audioBlob);
                 }
                 // Exclude audioData from displayData
-                const restData = (({ audioData, ...rest }) => rest)(parsed.data);
+                const { audioData, ...restData } = parsed.data;
                 displayData = JSON.stringify(restData, null, 2);
+                removeFunc(audioData)
               }
             } catch {}
             decryptedDisplay = (
@@ -140,8 +157,8 @@ export default function ContributionsDashboard() {
               {decryptedDisplay ? (
                 decryptedDisplay
               ) : (
-                <Button onClick={() => handleDecrypt(file)} disabled={decryptingId === file.id as string}>
-                  {decryptingId === file.id as string ? 'Decrypting...' : 'Decrypt'}
+                <Button onClick={() => handleDecrypt(file)} disabled={decryptingId === file.id}>
+                  {decryptingId === file.id ? 'Decrypting...' : 'Decrypt'}
                 </Button>
               )}
             </li>

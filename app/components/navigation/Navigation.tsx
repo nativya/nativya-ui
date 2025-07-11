@@ -12,6 +12,14 @@ interface NavigationProps {
   onTabChange: (tab: string) => void;
 }
 
+// Wherever you define your tab type, e.g.:
+type Tab = {
+  id: string;
+  label: string;
+  icon: string;
+  badge?: number; // <-- add this line
+};
+
 export default function Navigation({ currentTab, onTabChange }: NavigationProps) {
   const { currentLanguage, availableLanguages, setLanguage } = useAppStore();
   const { data: session } = useSession();
@@ -26,7 +34,7 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
     setIsClient(true);
   }, []);
 
-  const tabs = [
+  const tabs : Tab[] = [
     { id: 'prompt', label: '📝 Prompts', icon: '📝' },
     { id: 'dashboard', label: '📊 Dashboard', icon: '📊' }
   ];

@@ -3,9 +3,11 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/lib/auth/authOptions";
 import { google } from "googleapis";
 import type { Session } from "next-auth";
+import { drive_v3 } from "googleapis";
+
 
 // Helper to find the folder ID for 'VANA DLP Data'
-async function getVanaDlpFolderId(drive) {
+async function getVanaDlpFolderId(drive:drive_v3.Drive) {
   const res = await drive.files.list({
     q: "name = 'VANA DLP Data' and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
     fields: "files(id, name)",
@@ -52,14 +54,14 @@ export async function GET() {
           { fileId: String(file.id), alt: "media" },
           { responseType: "arraybuffer" }
         );
-        // @ts-expect-error: res.data is the arraybuffer
+        
         return {
           id: file.id,
           name: file.name,
           createdTime: file.createdTime,
           mimeType: file.mimeType,
           size: file.size,
-          encryptedData: Buffer.from(res.data).toString("base64"),
+          encryptedData: Buffer.from(res.data as ArrayBuffer).toString("base64"),
         };
       })
     );

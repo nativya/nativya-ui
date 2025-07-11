@@ -56,8 +56,12 @@ export async function clientSideDecrypt(
     // Convert decrypted data back to Blob
     const decryptedBlob = new Blob([decrypted as Uint8Array]);
     return decryptedBlob;
-  } catch (error) {
-    throw new Error(`Decryption failed: ${error.message}`);
+  } 
+    catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Decryption failed: ${error.message}`);
+      }
+      throw new Error('Decryption failed: ' + String(error));
   }
 }
 
@@ -199,16 +203,20 @@ export const decryptWithWalletPrivateKey = async (
     );
     
     return decryptedBuffer.toString();
-  } catch (error) {
-    throw new Error(`Wallet decryption failed: ${error.message}`);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw new Error(`Wallet decryption failed: ${error.message}`);
+    } else {
+      throw new Error("Wallet decryption failed: Unknown error");
+    }
   }
 };
-
 /**
  * Utility function to validate if a string is a valid hex
  * @param hex The hex string to validate
  * @returns boolean indicating if the string is valid hex
- */
+*/
+
 export function isValidHex(hex: string): boolean {
   return /^[0-9a-fA-F]+$/.test(hex.replace(/^0x/, ""));
 }
