@@ -105,7 +105,7 @@ export default function ContributionsDashboard() {
                   audioUrl = URL.createObjectURL(audioBlob);
                 }
                 // Exclude audioData from displayData
-                const { _audioData, ...restData } = parsed.data;
+                const restData = (({ audioData, ...rest }) => rest)(parsed.data);
                 displayData = JSON.stringify(restData, null, 2);
               }
             } catch {}
