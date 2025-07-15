@@ -38,8 +38,8 @@ export default function PromptSelector() {
   return (
     <div className="w-full max-w-4xl mx-auto p-4 sm:p-6">
       <div className="text-center mb-6 sm:mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-          Choose a Prompt
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+          <span>Choose a Prompt</span> <span className="text-xl">📝</span>
         </h2>
         <p className="text-gray-600 text-sm sm:text-base">
           Select a topic to contribute data in {currentLanguage.nativeName} ({currentLanguage.name})
@@ -52,13 +52,13 @@ export default function PromptSelector() {
           <button
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
-            className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 outline-thick ${
               selectedCategory === category.id
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-blue-500 text-white scale-105 shadow-lg'
+                : 'glass bg-gray-100 text-gray-700 hover:bg-blue-100 hover:scale-105'
             }`}
           >
-            {category.name}
+            {category.name} {category.id === 'all' ? '🌐' : category.id === 'daily' ? '🌞' : category.id === 'family' ? '👨‍👩‍👧‍👦' : category.id === 'food' ? '🍲' : category.id === 'culture' ? '🎭' : category.id === 'travel' ? '✈️' : ''}
           </button>
         ))}
       </div>
@@ -68,7 +68,7 @@ export default function PromptSelector() {
         {filteredPrompts.map((prompt: Prompt) => (
           <div
             key={prompt.id}
-            className={`p-4 sm:p-6 border-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md ${
+            className={`glass outline-thick p-4 sm:p-6 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-xl bg-white/80 ${
               currentPrompt?.id === prompt.id
                 ? 'border-blue-500 bg-blue-50'
                 : 'border-gray-200 hover:border-blue-300'
@@ -76,8 +76,8 @@ export default function PromptSelector() {
             onClick={() => handlePromptSelect(prompt)}
           >
             <div className="mb-3 sm:mb-4">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                {prompt.title}
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 flex items-center gap-1">
+                {prompt.title} <span className="text-lg">💬</span>
               </h3>
               <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
                 {prompt.description}
@@ -109,7 +109,7 @@ export default function PromptSelector() {
                 prompt.category === 'travel' ? 'bg-blue-100 text-blue-800' :
                 'bg-gray-100 text-gray-800'
               }`}>
-                {prompt.category}
+                {prompt.category} {prompt.category === 'daily' ? '🌞' : prompt.category === 'family' ? '👨‍👩‍👧‍👦' : prompt.category === 'food' ? '🍲' : prompt.category === 'culture' ? '🎭' : prompt.category === 'travel' ? '✈️' : ''}
               </span>
             </div>
           </div>

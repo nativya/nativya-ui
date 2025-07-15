@@ -6,10 +6,12 @@ import { Language } from '../../types';
 import { useSession } from "next-auth/react";
 import { LogoutButton } from "../login/LogoutButton";
 import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface NavigationProps {
-  currentTab: string;
-  onTabChange: (tab: string) => void;
+  currentTab?: string;
+  onTabChange?: (tab: string) => void;
 }
 
 // Wherever you define your tab type, e.g.:
@@ -23,6 +25,7 @@ type Tab = {
 export default function Navigation({ currentTab, onTabChange }: NavigationProps) {
   const { currentLanguage, availableLanguages, setLanguage } = useAppStore();
   const { data: session } = useSession();
+  const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -52,7 +55,16 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
   };
 
   const handleTabChange = (tabId: string) => {
-    onTabChange(tabId);
+    if (onTabChange) {
+      onTabChange(tabId);
+    } else {
+      // Use Next.js routing if no onTabChange provided
+      if (tabId === 'prompt') {
+        window.location.href = '/prompts';
+      } else if (tabId === 'dashboard') {
+        window.location.href = '/dashboard';
+      }
+    }
     setIsMobileMenuOpen(false);
   };
 
@@ -70,51 +82,58 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
   };
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav className="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-blue-200 shadow-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <Image 
-                src="/Nativya_logo.jpg" 
-                alt="Nativya Logo" 
-                className="h-8 w-auto object-contain"
-                width={32}
-                height={32}
-              />
-            </div>
-          </div>
+        <div className="flex justify-between h-16 items-center">
+          {/* Branding */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <Image 
+              src="/Nativya_logo.jpg" 
+              alt="Nativya Logo" 
+              className="h-8 w-auto object-contain rounded-lg border-2 border-blue-200 group-hover:scale-105 transition-transform"
+              width={32}
+              height={32}
+            />
+            <span className="text-xl font-extrabold text-blue-700 flex items-center gap-1">
+              Nativya <span className="text-2xl">🌐</span>
+            </span>
+          </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => onTabChange(tab.id)}
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
-                  currentTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.label}
-                {tab.badge && tab.badge > 0 && isClient && (
-                  <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
-                    {tab.badge}
-                  </span>
-                )}
-              </button>
-            ))}
+          <div className="hidden md:flex items-center gap-6">
+            {tabs.map((tab) => {
+              const isActive = currentTab ? currentTab === tab.id : 
+                (tab.id === 'prompt' && pathname.startsWith('/prompts')) ||
+                (tab.id === 'dashboard' && pathname.startsWith('/dashboard')) ||
+                (tab.id === 'prompt' && pathname.startsWith('/contribute'));
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`inline-flex items-center px-3 py-2 rounded-lg font-semibold text-base transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                    isActive
+                      ? 'bg-blue-100 text-blue-700 shadow border-2 border-blue-500'
+                      : 'text-gray-600 hover:bg-blue-50 hover:text-blue-700 border-2 border-transparent'
+                  }`}
+                >
+                  <span className="mr-2">{tab.icon}</span>
+                  {tab.label}
+                  {tab.badge && tab.badge > 0 && isClient && (
+                    <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {/* Desktop Language Dropdown + Logout */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center gap-4">
             <div className="relative">
               <button
                 onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors"
+                className="flex items-center space-x-2 bg-white/70 backdrop-blur-md border border-blue-200 hover:bg-blue-50 px-3 py-2 rounded-lg transition-colors shadow"
               >
                 <span className="text-lg">
                   {currentLanguage ? currentLanguage.flag : '🌍'}
@@ -133,17 +152,16 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-
               {/* Desktop Dropdown Menu */}
               {isLanguageDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                  <div className="p-3 border-b border-gray-200">
+                <div className="absolute right-0 mt-2 w-80 bg-white/90 border border-blue-200 rounded-lg shadow-lg z-50 backdrop-blur-md">
+                  <div className="p-3 border-b border-blue-100">
                     <input
                       type="text"
                       placeholder="Search languages..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white/80"
                     />
                   </div>
                   <div className="max-h-64 overflow-y-auto">
@@ -152,8 +170,8 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
                         <button
                           key={language.code}
                           onClick={() => handleLanguageSelect(language)}
-                          className={`w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                            currentLanguage?.code === language.code ? 'bg-blue-50' : ''
+                          className={`w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-blue-50 transition-colors ${
+                            currentLanguage?.code === language.code ? 'bg-blue-100' : ''
                           }`}
                         >
                           <span className="text-xl">{language.flag}</span>
@@ -181,74 +199,64 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
                 </div>
               )}
             </div>
+            {/* Logout Button */}
             {session && <LogoutButton />}
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile Hamburger */}
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleMobileMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
-              aria-label="Toggle mobile menu"
+              className="inline-flex items-center justify-center p-2 rounded-md text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              aria-expanded={isMobileMenuOpen}
             >
-              {isMobileMenuOpen ? (
-                <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
+              <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d={isMobileMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}
+                />
+              </svg>
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Mobile menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {/* Mobile Navigation Tabs */}
-            {tabs.map((tab) => (
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-white/90 backdrop-blur-md border-t border-blue-200 shadow-lg rounded-b-xl mt-2 p-4 flex flex-col gap-4 animate-fade-in-down">
+            {tabs.map((tab) => {
+              const isActive = currentTab ? currentTab === tab.id : 
+                (tab.id === 'prompt' && pathname.startsWith('/prompts')) ||
+                (tab.id === 'dashboard' && pathname.startsWith('/dashboard')) ||
+                (tab.id === 'prompt' && pathname.startsWith('/contribute'));
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`w-full flex items-center px-4 py-3 rounded-lg font-semibold text-base transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                    isActive
+                      ? 'bg-blue-100 text-blue-700 shadow border-2 border-blue-500'
+                      : 'text-gray-600 hover:bg-blue-50 hover:text-blue-700 border-2 border-transparent'
+                  }`}
+                >
+                  <span className="mr-2">{tab.icon}</span>
+                  {tab.label}
+                </button>
+              );
+            })}
+            {/* Language Dropdown */}
+            <div className="relative mt-2">
               <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`w-full text-left block px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                  currentTab === tab.id
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
+                onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+                className="flex items-center space-x-2 bg-white/70 backdrop-blur-md border border-blue-200 hover:bg-blue-50 px-3 py-2 rounded-lg transition-colors shadow"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <span className="mr-3">{tab.icon}</span>
-                    {tab.label}
-                  </div>
-                  {tab.badge && tab.badge > 0 && isClient && (
-                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
-                      {tab.badge}
-                    </span>
-                  )}
-                </div>
-              </button>
-            ))}
-
-            {/* Mobile Language Selector */}
-            <div className="px-3 py-2">
-              <div className="text-sm font-medium text-gray-500 mb-2">Language</div>
-              <button
-                onClick={toggleLanguageDropdown}
-                className="w-full flex items-center justify-between bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors"
-              >
-                <div className="flex items-center space-x-2">
-                  <span className="text-lg">
-                    {currentLanguage ? currentLanguage.flag : '🌍'}
-                  </span>
-                  <span className="text-sm font-medium text-gray-700">
-                    {currentLanguage ? currentLanguage.nativeName : 'Select Language'}
-                  </span>
-                </div>
+                <span className="text-lg">
+                  {currentLanguage ? currentLanguage.flag : '🌍'}
+                </span>
+                <span className="text-sm font-medium text-gray-700">
+                  {currentLanguage ? currentLanguage.nativeName : 'Select Language'}
+                </span>
                 <svg
                   className={`w-4 h-4 text-gray-500 transition-transform ${
                     isLanguageDropdownOpen ? 'rotate-180' : ''
@@ -260,28 +268,26 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-
-              {/* Mobile Language Dropdown */}
+              {/* Dropdown Menu */}
               {isLanguageDropdownOpen && (
-                <div className="mt-2 bg-white border border-gray-200 rounded-lg shadow-lg">
-                  <div className="p-3 border-b border-gray-200">
+                <div className="absolute right-0 mt-2 w-80 bg-white/90 border border-blue-200 rounded-lg shadow-lg z-50 backdrop-blur-md">
+                  <div className="p-3 border-b border-blue-100">
                     <input
                       type="text"
                       placeholder="Search languages..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                      onClick={(e) => e.stopPropagation()}
+                      className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white/80"
                     />
                   </div>
-                  <div className="max-h-48 overflow-y-auto">
+                  <div className="max-h-64 overflow-y-auto">
                     {filteredLanguages.length > 0 ? (
                       filteredLanguages.map((language: Language) => (
                         <button
                           key={language.code}
                           onClick={() => handleLanguageSelect(language)}
-                          className={`w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                            currentLanguage?.code === language.code ? 'bg-blue-50' : ''
+                          className={`w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-blue-50 transition-colors ${
+                            currentLanguage?.code === language.code ? 'bg-blue-100' : ''
                           }`}
                         >
                           <span className="text-xl">{language.flag}</span>
@@ -309,22 +315,11 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
                 </div>
               )}
             </div>
-            {session && (
-              <div className="mt-4">
-                <LogoutButton />
-              </div>
-            )}
+            {/* Logout Button */}
+            {session && <LogoutButton />}
           </div>
-        </div>
-      )}
-
-      {/* Click outside to close desktop language dropdown only */}
-      {isLanguageDropdownOpen && (
-        <div
-          className="fixed inset-0 z-40 md:block hidden"
-          onClick={() => setIsLanguageDropdownOpen(false)}
-        />
-      )}
+        )}
+      </div>
     </nav>
   );
 } 

@@ -24,3 +24,49 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-radius: 1.5rem;
+  border: 1.5px solid rgba(30, 64, 175, 0.18); /* blue-800, subtle */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+}
+
+/* Boxmoji thick outline utility */
+.outline-thick {
+  border: 3px solid #171717; /* matches --foreground */
+  border-radius: 1.5rem;
+}
+
+/* Floating emoji animation */
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-16px); }
+  100% { transform: translateY(0); }
+}
+.float-emoji {
+  animation: float 3s ease-in-out infinite;
+}
+
+.footer-x-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'serif';
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 1;
+  height: 20px;
+  width: 20px;
+  text-align: center;
+  margin-top: 1px;
+}
+
+/* Ensure all social icons in the footer are aligned */
+footer .flex.gap-3 {
+  align-items: center;
+  display: flex;
+}

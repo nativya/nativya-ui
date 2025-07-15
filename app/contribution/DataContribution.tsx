@@ -33,7 +33,8 @@ const convertBlobToBase64 = (blob: Blob): Promise<string> => {
   });
 };
 
-export default function DataContribution({ prompt, onBack }: DataContributionProps) {
+export default function DataContribution({ prompt }: DataContributionProps) {
+  // console.log('DataContribution rendered with onBack:', !!onBack);
   const { currentLanguage } = useAppStore();
   const [inputType, setInputType] = useState<'text' | 'audio'>('text');
   const [textContent, setTextContent] = useState('');
@@ -156,15 +157,14 @@ export default function DataContribution({ prompt, onBack }: DataContributionPro
       {/* Auth status */}
       <div className="mb-4 flex flex-col gap-2">
       </div>
-      
       {/* Only show form if wallet is connected */}
       {address ? (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="glass outline-thick bg-white/80 p-6 sm:p-10 shadow-xl">
           {/* Back Button */}
-          {onBack && <BackButton onBack={onBack} />}
+          {/* <BackButton onBack={onBack || (() => console.log('No onBack provided'))} /> */}
 
           <PromptHeader 
-            title={prompt.title} 
+            title={prompt.title + ' 📝'}
             description={prompt.description} 
             examples={prompt.examples} 
           />
@@ -186,11 +186,6 @@ export default function DataContribution({ prompt, onBack }: DataContributionPro
           {inputType === 'audio' && (
             <AudioRecorder
               onAudioReady={(blob, url, time) => {
-                console.log('Audio ready:', { 
-                  blobSize: blob.size, 
-                  blobType: blob.type, 
-                  duration: time 
-                });
                 setAudioBlob(blob);
                 setAudioUrl(url);
                 setRecordingTime(time);
@@ -198,14 +193,17 @@ export default function DataContribution({ prompt, onBack }: DataContributionPro
             />
           )}
 
-          {/* Submit Button */}
-          <SubmitButton canSubmit={canSubmit} isSubmitting={isSubmitting} />
+          <div className="mt-6 flex gap-4">
+            <SubmitButton
+              canSubmit={canSubmit}
+              isSubmitting={isSubmitting}
+            />
+            <WalletConnector />
+          </div>
         </form>
       ) : (
-        <div className="text-gray-500 mt-4">Please connect your wallet to contribute.</div>
+        <WalletConnector />
       )}
-      
-      <WalletConnector />
     </div>
   );
 }
