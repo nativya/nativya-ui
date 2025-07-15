@@ -7,7 +7,7 @@ import ContributionsDashboard from '../components/dashboard/ContributionsDashboa
 import AppLayout from '../components/layout/AppLayout';
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 

@@ -33,7 +33,7 @@ export default function ContributionsDashboard() {
         console.log(files)
         setLoading(false)
       });
-  }, []);
+  }, [files]);
 
   // Decrypt handler
   async function handleDecrypt(file: ContributionFile) {

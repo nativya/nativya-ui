@@ -76,11 +76,6 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
     }
   };
 
-  const toggleLanguageDropdown = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent event bubbling
-    setIsLanguageDropdownOpen(!isLanguageDropdownOpen);
-  };
-
   return (
     <nav className="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-blue-200 shadow-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -7,7 +7,6 @@ import InputTypeSelector from './ui/InputTypeSelector';
 import TextInput from './ui/TextInput';
 import AudioRecorder from './ui/AudioRecorder';
 import PromptHeader from './ui/PromptHeader';
-import BackButton from './ui/BackButton';
 import SubmitButton from './ui/SubmitButton';
 import { useContributionFlow } from './hooks/useContributionFlow';
 import { useSession } from 'next-auth/react';

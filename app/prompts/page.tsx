@@ -8,7 +8,7 @@ import PromptSelector from '../components/PromptSelector';
 import AppLayout from '../components/layout/AppLayout';
 
 export default function PromptsPage() {
-  const { data: session, status } = useSession();
+  const {  status } = useSession();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const { currentLanguage, currentPrompt } = useAppStore();
