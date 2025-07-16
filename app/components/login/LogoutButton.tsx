@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 import { Button } from "../ui/Button";
+import { useAppStore } from "@/app/store/useAppStore";
 
 export function LogoutButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,7 +11,9 @@ export function LogoutButton() {
   const handleLogout = async () => {
     setIsLoading(true);
     try {
+      useAppStore.persist.clearStorage()
       await signOut({ callbackUrl: "/" });
+
     } catch (error) {
       console.error("Logout failed", error);
     } finally {
