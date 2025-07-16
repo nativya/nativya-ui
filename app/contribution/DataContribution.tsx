@@ -4,7 +4,6 @@ import { AudioData, Prompt } from '../types';
 import { useAppStore } from '../store/useAppStore';
 import { useWallet } from "../lib/auth/useWallet";
 import InputTypeSelector from './ui/InputTypeSelector';
-import TextInput from './ui/TextInput';
 import AudioRecorder from './ui/AudioRecorder';
 import PromptHeader from './ui/PromptHeader';
 import SubmitButton from './ui/SubmitButton';
@@ -12,6 +11,8 @@ import { useContributionFlow } from './hooks/useContributionFlow';
 import { useSession } from 'next-auth/react';
 import { useUserData } from '../components/profile/hooks/useUserData';
 import WalletConnector from './utils/WalletConnector';
+import { ReactTransliterate as Transliterate } from 'react-transliterate';
+import 'react-transliterate/dist/index.css';
 
 interface DataContributionProps {
   prompt: Prompt;
@@ -173,11 +174,12 @@ export default function DataContribution({ prompt }: DataContributionProps) {
 
           {/* Text Input */}
           {inputType === 'text' && (
-            <TextInput
+            <Transliterate
+              lang="hi"
               value={textContent}
-              onChange={setTextContent}
-              languageName={currentLanguage?.name}
-              languageNativeName={currentLanguage?.nativeName}
+              onChangeText={setTextContent}
+              placeholder="Type in Hindi using English letters..."
+              className="your-input-class w-full px-4 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white shadow"
             />
           )}
 

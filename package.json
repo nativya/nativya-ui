@@ -22,6 +22,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.52.1",
+    "react-transliterate": "^1.1.9",
     "tailwind-merge": "^2.5.4",
     "zustand": "^4.5.7"
   },

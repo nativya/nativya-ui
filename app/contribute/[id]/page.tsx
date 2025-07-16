@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '../../store/useAppStore';
 import DataContribution from '../../contribution/DataContribution';
@@ -16,6 +17,7 @@ interface ContributePageProps {
 }
 
 export default function ContributePage({ params }: ContributePageProps) {
+  const {  status } = useSession();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const { currentLanguage, prompts, setCurrentPrompt } = useAppStore();

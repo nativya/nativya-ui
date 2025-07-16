@@ -30,10 +30,9 @@ export default function ContributionsDashboard() {
       .then(res => res.json())
       .then(data => setFiles(data.files || []))
       .finally(() =>{ 
-        console.log(files)
         setLoading(false)
       });
-  }, [files]);
+  }, []);
 
   // Decrypt handler
   async function handleDecrypt(file: ContributionFile) {
