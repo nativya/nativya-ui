@@ -11,7 +11,7 @@ import { useContributionFlow } from './hooks/useContributionFlow';
 import { useSession } from 'next-auth/react';
 import { useUserData } from '../components/profile/hooks/useUserData';
 import WalletConnector from './utils/WalletConnector';
-import { ReactTransliterate as Transliterate } from 'react-transliterate';
+import { Language, ReactTransliterate as Transliterate } from 'react-transliterate';
 import 'react-transliterate/dist/index.css';
 
 interface DataContributionProps {
@@ -175,7 +175,7 @@ export default function DataContribution({ prompt }: DataContributionProps) {
           {/* Text Input */}
           {inputType === 'text' && (
             <Transliterate
-              lang={(currentLanguage?.code as any) || 'hi'}
+              lang={(currentLanguage?.code as Language) || 'hi'}
               value={textContent}
               onChangeText={setTextContent}
               placeholder={

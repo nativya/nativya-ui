@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import Navigation from '../navigation/Navigation';
+import Image from 'next/image';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -21,7 +22,7 @@ export default function AppLayout({ children, currentTab }: AppLayoutProps) {
           {/* Branding & Tagline */}
           <div className="flex flex-col items-center md:items-start gap-2">
             <div className="flex items-center gap-2 text-2xl font-extrabold text-blue-700">
-              <img src="/Nativya_logo.jpg" alt="Nativya Logo" className="h-8 w-auto object-contain rounded-lg border-2 border-blue-200" width={32} height={32} />
+              <Image src="/Nativya_logo.jpg" alt="Nativya Logo" className="h-8 w-auto object-contain rounded-lg border-2 border-blue-200" width={32} height={32} />
               <span>Nativya</span>
             </div>
             <div className="text-sm text-blue-900 font-medium opacity-80 text-center md:text-left">
