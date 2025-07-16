@@ -175,10 +175,14 @@ export default function DataContribution({ prompt }: DataContributionProps) {
           {/* Text Input */}
           {inputType === 'text' && (
             <Transliterate
-              lang="hi"
+              lang={(currentLanguage?.code as any) || 'hi'}
               value={textContent}
               onChangeText={setTextContent}
-              placeholder="Type in Hindi using English letters..."
+              placeholder={
+                currentLanguage
+                  ? `Type in ${currentLanguage.name} using English letters...`
+                  : 'Type in Hindi using English letters...'
+              }
               className="your-input-class w-full px-4 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white shadow"
             />
           )}
