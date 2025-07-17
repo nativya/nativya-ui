@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { Prompt } from '../types';
 import { useAppStore } from '../store/useAppStore';
+import { useRouter } from 'next/navigation';
 
 export default function PromptSelector() {
-  const { prompts, currentPrompt, setCurrentPrompt, currentLanguage } = useAppStore();
+  const { prompts, currentLanguage } = useAppStore();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const router = useRouter();
 
   const categories = [
     { id: 'all', name: 'All Prompts' },
@@ -22,7 +24,7 @@ export default function PromptSelector() {
     : prompts.filter((prompt: Prompt) => prompt.category === selectedCategory);
 
   const handlePromptSelect = (prompt: Prompt) => {
-    setCurrentPrompt(prompt);
+    router.push(`/contribute/${prompt.id}`);
   };
 
   if (!currentLanguage) {
@@ -68,11 +70,7 @@ export default function PromptSelector() {
         {filteredPrompts.map((prompt: Prompt) => (
           <div
             key={prompt.id}
-            className={`glass outline-thick p-4 sm:p-6 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-xl bg-white/80 ${
-              currentPrompt?.id === prompt.id
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-blue-300'
-            }`}
+            className={`glass outline-thick p-4 sm:p-6 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-xl bg-white/80 border-gray-200 hover:border-blue-300`}
             onClick={() => handlePromptSelect(prompt)}
           >
             <div className="mb-3 sm:mb-4">

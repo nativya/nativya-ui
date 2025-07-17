@@ -61,12 +61,12 @@ export const INDIAN_LANGUAGES: Language[] = [
     nativeName: 'ଓଡ଼ିଆ',
     flag: '🇮🇳'
   },
-  {
-    code: 'as',
-    name: 'Assamese',
-    nativeName: 'অসমীয়া',
-    flag: '🇮🇳'
-  },
+  // {
+  //   code: 'as',
+  //   name: 'Assamese',
+  //   nativeName: 'অসমীয়া',
+  //   flag: '🇮🇳'
+  // },
   {
     code: 'ur',
     name: 'Urdu',

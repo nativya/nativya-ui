@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '../store/useAppStore';
-import PromptSelector from '../components/PromptSelector';
+import PromptSelector from './PromptSelector';
 import AppLayout from '../components/layout/AppLayout';
 
 export default function PromptsPage() {
