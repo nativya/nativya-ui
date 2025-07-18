@@ -13,17 +13,11 @@ import { useUserData } from '../components/profile/hooks/useUserData';
 import { Language, ReactTransliterate as Transliterate } from 'react-transliterate';
 import 'react-transliterate/dist/index.css';
 
-interface DataContributionProps {
-  prompt: Prompt;
-  onBack?: () => void;
-}
-
 // Helper function to convert blob to base64
 const convertBlobToBase64 = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      // Remove the data URL prefix (data:audio/wav;base64,) to get pure base64
       const base64String = (reader.result as string).split(',')[1];
       resolve(base64String);
     };
@@ -32,27 +26,31 @@ const convertBlobToBase64 = (blob: Blob): Promise<string> => {
   });
 };
 
+interface DataContributionProps {
+  prompt: Prompt;
+}
+
 export default function DataContribution({ prompt }: DataContributionProps) {
-  // console.log('DataContribution rendered with onBack:', !!onBack);
   const { currentLanguage } = useAppStore();
   const [inputType, setInputType] = useState<'text' | 'audio'>('text');
   const [textContent, setTextContent] = useState('');
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string>('');
   const [recordingTime, setRecordingTime] = useState(0);
+  // REVERT: isSubmitting is now local state again.
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { address } = useWallet();
   const { data: session } = useSession();
   const { userInfo, driveInfo } = useUserData();
 
   const {
+    // REVERT: isSubmitting is no longer destructured from the hook.
     isSuccess,
     handleContributeData,
     resetFlow,
   } = useContributionFlow();
 
   useEffect(() => {
-    // console.log("Wallet address in DataContribution:", address);
     return () => {
       if (audioUrl) {
         URL.revokeObjectURL(audioUrl);
@@ -62,43 +60,24 @@ export default function DataContribution({ prompt }: DataContributionProps) {
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
+    if (!session?.user || !userInfo || !driveInfo) {
+      alert("User information is not available. Please log in again.");
+      return;
+    }
+    // REVERT: Manually control submitting state.
     setIsSubmitting(true);
-    
-    if (!session?.user) {
-      setIsSubmitting(false);
-      alert("not logged in");
-      return;
-    }
-
-    if (!userInfo || !driveInfo) {
-      setIsSubmitting(false);
-      alert("not logged in");
-      return;
-    }
-
-    // Reset the flow before starting a new contribution
     resetFlow();
 
     try {
-      console.log("Try Catch block");
-      
-      // Convert audioBlob to base64 if it exists
       let audioData: AudioData | undefined = undefined;
-      if (audioBlob) {
-        console.log('Converting audio blob to base64...', {
-          size: audioBlob.size,
-          type: audioBlob.type
-        });
-        
-        // Validate blob before conversion
+      if (inputType === 'audio' && audioBlob) {
         if (audioBlob.size === 0) {
           alert('Audio recording is empty. Please record again.');
+          // REVERT: Ensure isSubmitting is set to false on early return.
           setIsSubmitting(false);
           return;
         }
-        
         const base64Audio = await convertBlobToBase64(audioBlob);
-        
         audioData = {
           base64: base64Audio,
           mimeType: audioBlob.type || 'audio/wav',
@@ -106,21 +85,14 @@ export default function DataContribution({ prompt }: DataContributionProps) {
           name: `audio_${userInfo.id}_${Date.now()}.wav`,
           duration: recordingTime
         };
-        
-        console.log('Audio data prepared:', {
-          mimeType: audioData.mimeType,
-          size: audioData.size,
-          base64Length: base64Audio.length
-        });
       }
 
       await handleContributeData(userInfo, driveInfo, address, {
         id: `${userInfo.id || "unknown"}_${Date.now()}`,
         languageCode: currentLanguage?.code || "",
         promptId: prompt.id,
-        textContent,
-        audioData: audioData, // Send structured audio data instead of audioBlob
-        audioUrl: audioUrl || undefined,
+        textContent: inputType === 'text' ? textContent : '',
+        audioData: audioData,
         timestamp: new Date(),
         userId: userInfo.id,
         metadata: {
@@ -128,23 +100,28 @@ export default function DataContribution({ prompt }: DataContributionProps) {
           textLength: inputType === 'text' ? textContent.length : undefined,
         },
       });
-      
+
+    } catch (error) {
+      console.error('Error submitting contribution:', error);
+      alert('Failed to submit contribution. Please try again.');
+    } finally {
+      // REVERT: Always set submitting to false after the attempt.
       setIsSubmitting(false);
-      
-      // Optional: Clear form after successful submission
+    }
+  };
+  
+  // After a successful submission, clear the form.
+  useEffect(() => {
       if (isSuccess) {
         setTextContent('');
         setAudioBlob(null);
         setAudioUrl('');
         setRecordingTime(0);
+        // Optionally, you can show a success message and then reset the flow state
+        // setTimeout(() => resetFlow(), 3000);
       }
-      
-    } catch (error) {
-      console.error('Error submitting contribution:', error);
-      setIsSubmitting(false);
-      alert('Failed to submit contribution. Please try again.');
-    }
-  };
+  }, [isSuccess]);
+
 
   const canSubmit = !!(currentLanguage && (
     (inputType === 'text' && textContent.trim()) ||
@@ -152,27 +129,22 @@ export default function DataContribution({ prompt }: DataContributionProps) {
   ));
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4 sm:p-6">
-      {/* Auth status */}
-      <div className="mb-4 flex flex-col gap-2">
-      </div>
-      {/* Only show form if wallet is connected */}
-      
-        <form onSubmit={handleSubmit} className="glass outline-thick bg-white/80 p-6 sm:p-10 shadow-xl">
-          {/* Back Button */}
-          {/* <BackButton onBack={onBack || (() => console.log('No onBack provided'))} /> */}
+    // UI UPDATE: Main container with modern card styling
+    <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-6 sm:p-8">
+      <form onSubmit={handleSubmit}>
+        <PromptHeader
+          title={prompt.title}
+          description={prompt.description}
+          examples={prompt.examples}
+        />
 
-          <PromptHeader 
-            title={prompt.title + ' 📝'}
-            description={prompt.description} 
-            examples={prompt.examples} 
-          />
-
-          {/* Input Type Selector */}
+        <div className="my-6">
           <InputTypeSelector inputType={inputType} setInputType={setInputType} />
+        </div>
 
-          {/* Text Input */}
-          {inputType === 'text' && (
+        {/* Text Input */}
+        {inputType === 'text' && (
+          <div className="animate-fade-in">
             <Transliterate
               lang={(currentLanguage?.code as Language) || 'hi'}
               value={textContent}
@@ -180,14 +152,17 @@ export default function DataContribution({ prompt }: DataContributionProps) {
               placeholder={
                 currentLanguage
                   ? `Type in ${currentLanguage.name} using English letters...`
-                  : 'Type in Hindi using English letters...'
+                  : 'Select a language to begin...'
               }
-              className="your-input-class w-full px-4 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white shadow"
+              // UI UPDATE: Styling for the transliterate component
+              className="w-full h-32 p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-base resize-none"
             />
-          )}
+          </div>
+        )}
 
-          {/* Audio Recording */}
-          {inputType === 'audio' && (
+        {/* Audio Recording */}
+        {inputType === 'audio' && (
+          <div className="animate-fade-in">
             <AudioRecorder
               onAudioReady={(blob, url, time) => {
                 setAudioBlob(blob);
@@ -195,16 +170,17 @@ export default function DataContribution({ prompt }: DataContributionProps) {
                 setRecordingTime(time);
               }}
             />
-          )}
-
-          <div className="mt-6 flex gap-4">
-            <SubmitButton
-              canSubmit={canSubmit}
-              isSubmitting={isSubmitting}
-            />
-            {/* <WalletConnector /> */}
           </div>
-        </form>    
+        )}
+
+        <div className="mt-8 border-t border-slate-200 pt-6">
+          <SubmitButton
+            canSubmit={canSubmit}
+            isSubmitting={isSubmitting}
+            // REVERT: isSuccess prop is removed as it's not accepted by the component.
+          />
+        </div>
+      </form>
     </div>
   );
 }

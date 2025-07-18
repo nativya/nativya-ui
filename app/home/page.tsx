@@ -87,20 +87,32 @@ export default function HomeTasksPage() {
             Choose a task below to help build better AI for your language. Complete tasks, earn rewards, and level up!
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {tasks.map((task) => (
-              <div key={task.id} className="glassmorphic rounded-2xl p-6 flex flex-col gap-3 border-2 border-blue-100 shadow-lg">
-                <div className="text-4xl mb-2">{task.emoji}</div>
-                <div className="font-bold text-xl text-blue-800 mb-1">{task.title}</div>
-                <div className="text-gray-600 mb-2">{task.description}</div>
-                <Link
-                  href={task.href}
-                  className="mt-auto px-4 py-2 rounded-lg font-bold text-white transition text-center bg-blue-600 hover:bg-blue-700"
-                  tabIndex={0}
-                >
-                  {task.cta}
-                </Link>
-              </div>
-            ))}
+            {tasks.map((task) => {
+              const isPrompts = task.id === 'prompts';
+              return (
+                <div key={task.id} className="glassmorphic rounded-2xl p-6 flex flex-col gap-3 border-2 border-blue-100 shadow-lg">
+                  <div className="text-4xl mb-2">{task.emoji}</div>
+                  <div className="font-bold text-xl text-blue-800 mb-1">{task.title}</div>
+                  <div className="text-gray-600 mb-2">{task.description}</div>
+                  {isPrompts ? (
+                    <Link
+                      href={task.href}
+                      className="mt-auto px-4 py-2 rounded-lg font-bold transition text-center bg-blue-600 text-white hover:bg-blue-700"
+                      tabIndex={0}
+                    >
+                      {task.cta}
+                    </Link>
+                  ) : (
+                    <span
+                      className="mt-auto px-4 py-2 rounded-lg font-bold transition text-center bg-gray-300 text-gray-500 cursor-not-allowed select-none"
+                      aria-disabled="true"
+                    >
+                      {task.cta}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
       )}

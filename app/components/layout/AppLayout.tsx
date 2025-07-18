@@ -5,6 +5,8 @@ import Navigation from '../navigation/Navigation';
 import Image from 'next/image';
 import { useWallet } from '../../lib/auth/useWallet';
 import WalletConnector from '../../contribution/utils/WalletConnector';
+// NEW: Importing icons for a professional look
+import { LockClosedIcon, InformationCircleIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -14,78 +16,78 @@ interface AppLayoutProps {
 export default function AppLayout({ children, currentTab }: AppLayoutProps) {
   const { address } = useWallet();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col">
-      <Navigation currentTab={currentTab} />
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full">
+    // UPDATED: Clean, light background for the entire app
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      {/* The Navigation component already has the updated light theme */}
+      <Navigation/>
+      
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 w-full">
         {!address ? (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="text-5xl mb-4">🔒</div>
-            <h2 className="text-2xl font-bold mb-2 text-gray-800">Connect Your Wallet</h2>
-            <p className="text-gray-600 mb-6 text-center max-w-md">
-              To access this feature, please connect your crypto wallet. This helps us verify your contributions and send you rewards securely.
+          // UPDATED: "Connect Wallet" prompt with the new light theme and professional icons
+          <div className="flex flex-col items-center justify-center text-center py-16 bg-white border border-slate-200 rounded-lg shadow-sm">
+            <div className="p-4 bg-indigo-100 rounded-full mb-5">
+              <LockClosedIcon className="w-8 h-8 text-indigo-600" />
+            </div>
+            <h2 className="text-2xl font-bold mb-2 text-slate-800">Connect Your Wallet to Continue</h2>
+            <p className="text-slate-600 mb-6 max-w-md">
+              Please connect your wallet to access application features, track contributions, and receive rewards securely.
             </p>
             <div>
               <WalletConnector />
             </div>
-            <div className="mt-4 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded px-3 py-2 max-w-xs text-center">
-              <strong>Tip:</strong> You can use MetaMask or any supported wallet.
+            <div className="mt-6 flex items-center gap-2 text-sm text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg px-4 py-2 max-w-sm">
+              <InformationCircleIcon className="w-5 h-5 flex-shrink-0" />
+              <span>You can use MetaMask, Coinbase Wallet, or any other supported wallet.</span>
             </div>
           </div>
         ) : (
           children
         )}
       </main>
-      {/* Footer */}
-      <footer className="relative z-10 bg-white/70 backdrop-blur-md border-t border-blue-200 shadow-2xl mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row md:justify-between md:items-center gap-8 md:gap-0">
-          {/* Branding & Tagline */}
-          <div className="flex flex-col items-center md:items-start gap-2">
-            <div className="flex items-center gap-2 text-2xl font-extrabold text-blue-700">
-              <Image src="/Nativya_logo.jpg" alt="Nativya Logo" className="h-8 w-auto object-contain rounded-lg border-2 border-blue-200" width={32} height={32} />
-              <span>Nativya</span>
+
+      {/* UPDATED: Footer with the new light theme */}
+      <footer className="bg-white border-t border-slate-200 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-8">
+            {/* Branding & Tagline */}
+            <div className="flex flex-col items-center md:items-start gap-2">
+              <div className="flex items-center gap-2.5 text-2xl font-bold text-slate-800">
+                <Image src="/Nativya_logo.jpg" alt="Nativya Logo" className="h-8 w-8 object-contain rounded-md" width={32} height={32} />
+                <span>Nativya</span>
+              </div>
+              <div className="text-sm text-slate-600 text-center md:text-left">
+                Building the future of AI with your voice & stories.
+              </div>
             </div>
-            <div className="text-sm text-blue-900 font-medium opacity-80 text-center md:text-left">
-              Building the future of AI with your voice & stories.
+
+            {/* CTA & Social */}
+            <div className="flex flex-col items-center md:items-end gap-4">
+              <a href="https://datadao.ai" target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-indigo-600 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500">
+                <span>Join Community</span>
+                <ArrowRightIcon className="w-4 h-4" />
+              </a>
+              <div className="flex gap-4">
+                {/* Social Icons (using simple paths for clean SVGs) */}
+                <a href="https://x.com/nativya_ai" className="text-slate-500 hover:text-indigo-600 transition-colors" aria-label="X (formerly Twitter)" target="_blank" rel="noopener noreferrer">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 16 16"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.6.75Zm-1.7 12.95h1.949L5.42 2.15H3.35l7.55 11.55Z"/></svg>
+                </a>
+                <a href="https://github.com/nativya" className="text-slate-500 hover:text-indigo-600 transition-colors" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+                </a>
+              </div>
             </div>
           </div>
-
-          {/* Navigation Links */}
-          <nav className="flex flex-col items-center gap-2 md:gap-3 md:flex-row md:items-center">
-            <a href="https://datadao.ai" target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline font-semibold transition-colors">Community</a>
-            <a href="#privacy" className="text-blue-700 hover:underline font-semibold transition-colors">Privacy</a>
-          </nav>
-
-          {/* CTA & Social */}
-          <div className="flex flex-col items-center gap-3 md:items-end">
-            <a href="https://datadao.ai" target="_blank" rel="noopener noreferrer"
-              className="bg-blue-600 text-white font-bold px-6 py-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors text-base flex items-center gap-2">
-              <span>Join Community</span> <span>🚀</span>
-            </a>
-            <div className="flex gap-3 mt-2">
-              {/* X (Twitter) */}
-              <a href="https://x.com/nativya_ai" className="text-blue-700 hover:text-blue-900 text-xl transition-colors" aria-label="X" target="_blank" rel="noopener noreferrer">
-                <span className="footer-x-icon">𝕏</span>
-              </a>
-              {/* Discord */}
-              <a href="#" className="text-blue-700 hover:text-blue-900 text-xl transition-colors" aria-label="Discord">
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.369A19.791 19.791 0 0 0 16.885 3.2a.117.117 0 0 0-.124.06c-.537.96-1.13 2.22-1.552 3.2a17.978 17.978 0 0 0-5.238 0c-.423-.98-1.016-2.24-1.553-3.2a.117.117 0 0 0-.124-.06A19.736 19.736 0 0 0 3.684 4.369a.105.105 0 0 0-.047.043C.533 9.043-.32 13.579.099 18.057a.12.12 0 0 0 .045.083c1.934 1.426 3.81 2.292 5.652 2.858a.117.117 0 0 0 .128-.043c.434-.594.82-1.22 1.153-1.877a.112.112 0 0 0-.062-.155c-.617-.234-1.205-.507-1.783-.818a.117.117 0 0 1-.012-.195c.12-.09.24-.18.354-.27a.112.112 0 0 1 .12-.01c3.747 1.71 7.789 1.71 11.51 0a.112.112 0 0 1 .121.009c.114.09.234.18.354.27a.117.117 0 0 1-.011.195c-.578.311-1.166.584-1.783.818a.112.112 0 0 0-.062.155c.333.657.719 1.283 1.153 1.877a.117.117 0 0 0 .128.043c1.843-.566 3.718-1.432 5.652-2.858a.12.12 0 0 0 .045-.083c.5-5.177-.838-9.684-3.537-13.645a.093.093 0 0 0-.047-.043zM8.02 15.331c-1.183 0-2.156-1.085-2.156-2.419 0-1.333.955-2.418 2.156-2.418 1.21 0 2.175 1.095 2.156 2.418 0 1.334-.955 2.419-2.156 2.419zm7.96 0c-1.183 0-2.156-1.085-2.156-2.419 0-1.333.955-2.418 2.156-2.418 1.21 0 2.175 1.095 2.156 2.418 0 1.334-.946 2.419-2.156 2.419z"/></svg>
-              </a>
-              {/* GitHub */}
-              <a href="https://github.com/nativya" className="text-blue-700 hover:text-blue-900 text-xl transition-colors" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.021c0 4.428 2.865 8.186 6.839 9.504.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.157-1.11-1.465-1.11-1.465-.908-.62.069-.608.069-.608 1.004.07 1.532 1.032 1.532 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.34-2.221-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.025A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.295 2.748-1.025 2.748-1.025.546 1.378.202 2.397.1 2.65.64.7 1.028 1.595 1.028 2.688 0 3.847-2.337 4.695-4.566 4.944.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.749 0 .267.18.578.688.48C19.138 20.203 22 16.447 22 12.021 22 6.484 17.523 2 12 2z"/></svg>
-              </a>
+          {/* Legal & Copyright */}
+          <div className="max-w-7xl mx-auto pt-8 flex flex-col md:flex-row justify-between items-center border-t border-slate-200 mt-8 text-sm text-slate-500">
+            <div className="mb-2 md:mb-0">© {new Date().getFullYear()} Nativya. All rights reserved.</div>
+            <div className="flex gap-4">
+              <a href="#privacy" className="hover:text-slate-900 hover:underline">Privacy Policy</a>
+              <a href="#terms" className="hover:text-slate-900 hover:underline">Terms of Use</a>
             </div>
-          </div>
-        </div>
-        {/* Legal & Copyright */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4 pt-6 flex flex-col md:flex-row justify-between items-center border-t border-blue-100 mt-6 text-xs text-blue-900 opacity-80">
-          <div className="mb-2 md:mb-0">© {new Date().getFullYear()} Nativya. All rights reserved.</div>
-          <div className="flex gap-4">
-            <a href="#privacy" className="hover:underline">Privacy Policy</a>
-            <a href="#terms" className="hover:underline">Terms of Use</a>
           </div>
         </div>
       </footer>
     </div>
   );
-} 
+}

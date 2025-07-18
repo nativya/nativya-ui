@@ -7,13 +7,21 @@ import { useAppStore } from '../store/useAppStore';
 import PromptSelector from './PromptSelector';
 import AppLayout from '../components/layout/AppLayout';
 
+// NEW: A modern SVG spinner component for the loading state
+const Spinner = () => (
+  <svg className="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  </svg>
+);
+
 export default function PromptsPage() {
-  const {  status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
-  const { currentLanguage, currentPrompt } = useAppStore();
+  const { currentPrompt } = useAppStore();
 
-  // Ensure client-side rendering to prevent hydration mismatch
+  // Ensure client-side rendering
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -32,17 +40,14 @@ export default function PromptsPage() {
     }
   }, [currentPrompt, router]);
 
-  // Show loading while checking authentication status
+  // UPDATED: Loading state to be consistent with the new theme
   if (status === 'loading' || !isClient) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="animate-pulse">
-          <div className="h-16 bg-white border-b border-gray-200"></div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="h-64 bg-white rounded-lg shadow"></div>
-          </div>
+      <AppLayout>
+        <div className="flex justify-center items-center py-20">
+          <Spinner />
         </div>
-      </div>
+      </AppLayout>
     );
   }
 
@@ -52,25 +57,10 @@ export default function PromptsPage() {
   }
 
   return (
-    <AppLayout currentTab="prompt">
-      {/* {!currentLanguage ? (
-        <div className="text-center py-8 sm:py-12">
-          <div className="text-4xl sm:text-6xl mb-4">🌍</div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-            Welcome to Nativya
-          </h2>
-          <p className="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base">
-            Please select a language from the navigation bar to get started with contributing data.
-          </p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 max-w-md mx-auto">
-            <p className="text-xs sm:text-sm text-blue-800">
-              💡 <strong>Tip:</strong> Use the language dropdown in the top-right corner to select your preferred language.
-            </p>
-          </div>
-        </div>
-      ) : ( */}
-        <PromptSelector />
-      {/* )} */}
+    // The AppLayout provides the base theme.
+    // The `currentTab` prop helps highlight the active tab in the navigation.
+    <AppLayout currentTab="tasks">
+      <PromptSelector />
     </AppLayout>
   );
-} 
+}
