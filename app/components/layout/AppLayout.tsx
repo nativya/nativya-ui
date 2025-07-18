@@ -3,6 +3,8 @@
 import { ReactNode } from 'react';
 import Navigation from '../navigation/Navigation';
 import Image from 'next/image';
+import { useWallet } from '../../lib/auth/useWallet';
+import WalletConnector from '../../contribution/utils/WalletConnector';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -10,11 +12,28 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children, currentTab }: AppLayoutProps) {
+  const { address } = useWallet();
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col">
       <Navigation currentTab={currentTab} />
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full">
-        {children}
+        {!address ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="text-5xl mb-4">🔒</div>
+            <h2 className="text-2xl font-bold mb-2 text-gray-800">Connect Your Wallet</h2>
+            <p className="text-gray-600 mb-6 text-center max-w-md">
+              To access this feature, please connect your crypto wallet. This helps us verify your contributions and send you rewards securely.
+            </p>
+            <div>
+              <WalletConnector />
+            </div>
+            <div className="mt-4 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded px-3 py-2 max-w-xs text-center">
+              <strong>Tip:</strong> You can use MetaMask or any supported wallet.
+            </div>
+          </div>
+        ) : (
+          children
+        )}
       </main>
       {/* Footer */}
       <footer className="relative z-10 bg-white/70 backdrop-blur-md border-t border-blue-200 shadow-2xl mt-auto">

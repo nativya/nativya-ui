@@ -10,7 +10,6 @@ import SubmitButton from './ui/SubmitButton';
 import { useContributionFlow } from './hooks/useContributionFlow';
 import { useSession } from 'next-auth/react';
 import { useUserData } from '../components/profile/hooks/useUserData';
-import WalletConnector from './utils/WalletConnector';
 import { Language, ReactTransliterate as Transliterate } from 'react-transliterate';
 import 'react-transliterate/dist/index.css';
 
@@ -158,7 +157,7 @@ export default function DataContribution({ prompt }: DataContributionProps) {
       <div className="mb-4 flex flex-col gap-2">
       </div>
       {/* Only show form if wallet is connected */}
-      {address ? (
+      
         <form onSubmit={handleSubmit} className="glass outline-thick bg-white/80 p-6 sm:p-10 shadow-xl">
           {/* Back Button */}
           {/* <BackButton onBack={onBack || (() => console.log('No onBack provided'))} /> */}
@@ -205,22 +204,7 @@ export default function DataContribution({ prompt }: DataContributionProps) {
             />
             {/* <WalletConnector /> */}
           </div>
-        </form>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-16">
-          <div className="text-5xl mb-4">🔒</div>
-          <h2 className="text-2xl font-bold mb-2 text-gray-800">Connect Your Wallet</h2>
-          <p className="text-gray-600 mb-6 text-center max-w-md">
-            To contribute data and earn rewards, please connect your crypto wallet. This helps us verify your contributions and send you rewards securely.
-          </p>
-          <div>
-            {/* <WalletConnector /> */}
-          </div>
-          <div className="mt-4 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded px-3 py-2 max-w-xs text-center">
-            <strong>Tip:</strong> You can use MetaMask or any supported wallet.
-          </div>
-        </div>
-      )}
+        </form>    
     </div>
   );
 }

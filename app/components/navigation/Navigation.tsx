@@ -17,7 +17,7 @@ interface NavigationProps {
   onTabChange?: (tab: string) => void;
 }
 
-export default function Navigation({ currentTab, onTabChange }: NavigationProps) {
+export default function Navigation({ currentTab }: NavigationProps) {
   const { currentLanguage, availableLanguages, setLanguage } = useAppStore();
   const { data: session } = useSession();
   const pathname = usePathname();
@@ -38,10 +38,10 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
     { id: 'dashboard', label: '📊 Dashboard', icon: '📊' }
   ];
 
-  const filteredLanguages = availableLanguages.filter((lang: Language) =>
-    lang.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lang.nativeName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const filteredLanguages = availableLanguages.filter((lang: Language) =>
+  //   lang.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   lang.nativeName.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   const handleLanguageSelect = (language: Language) => {
     setLanguage(language);
