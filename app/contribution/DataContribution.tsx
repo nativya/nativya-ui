@@ -203,11 +203,23 @@ export default function DataContribution({ prompt }: DataContributionProps) {
               canSubmit={canSubmit}
               isSubmitting={isSubmitting}
             />
-            <WalletConnector />
+            {/* <WalletConnector /> */}
           </div>
         </form>
       ) : (
-        <WalletConnector />
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="text-5xl mb-4">🔒</div>
+          <h2 className="text-2xl font-bold mb-2 text-gray-800">Connect Your Wallet</h2>
+          <p className="text-gray-600 mb-6 text-center max-w-md">
+            To contribute data and earn rewards, please connect your crypto wallet. This helps us verify your contributions and send you rewards securely.
+          </p>
+          <div>
+            {/* <WalletConnector /> */}
+          </div>
+          <div className="mt-4 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded px-3 py-2 max-w-xs text-center">
+            <strong>Tip:</strong> You can use MetaMask or any supported wallet.
+          </div>
+        </div>
       )}
     </div>
   );

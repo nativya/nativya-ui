@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { NavigationTabs, Tab } from './NavigationTabs';
 import { LanguageDropdown } from './LanguageDropdown';
+import WalletConnector from '../../contribution/utils/WalletConnector';
 
 interface NavigationProps {
   currentTab?: string;
@@ -86,7 +87,7 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
             />
           </div>
 
-          {/* Desktop Language Dropdown + Logout */}
+          {/* Desktop Language Dropdown + Wallet + Logout */}
           <div className="hidden md:flex items-center gap-4">
             <LanguageDropdown
               currentLanguage={currentLanguage}
@@ -97,6 +98,7 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
             />
+            <WalletConnector />
             {/* Logout Button */}
             {session && <LogoutButton />}
           </div>
@@ -141,6 +143,7 @@ export default function Navigation({ currentTab, onTabChange }: NavigationProps)
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
             />
+            <WalletConnector />
             {/* Logout Button */}
             {session && <LogoutButton />}
           </div>
