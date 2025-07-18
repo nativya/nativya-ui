@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Language } from '../../types';
 
 interface LanguageDropdownProps {
@@ -20,6 +20,13 @@ export function LanguageDropdown({
   searchTerm,
   setSearchTerm,
 }: LanguageDropdownProps) {
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure client-side rendering to prevent hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const filteredLanguages = availableLanguages.filter((lang: Language) =>
     lang.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     lang.nativeName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -32,10 +39,10 @@ export function LanguageDropdown({
         className="flex items-center space-x-2 bg-white/70 backdrop-blur-md border border-blue-200 hover:bg-blue-50 px-3 py-2 rounded-lg transition-colors shadow"
       >
         <span className="text-lg">
-          {currentLanguage ? currentLanguage.flag : '🌍'}
+          {isClient && currentLanguage ? currentLanguage.flag : '🌍'}
         </span>
         <span className="text-sm font-medium text-gray-700">
-          {currentLanguage ? currentLanguage.nativeName : 'Select Language'}
+          {isClient && currentLanguage ? currentLanguage.nativeName : 'Select Language'}
         </span>
         <svg
           className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}

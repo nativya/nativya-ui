@@ -53,7 +53,7 @@ export default function PromptsPage() {
 
   return (
     <AppLayout currentTab="prompt">
-      {!currentLanguage ? (
+      {/* {!currentLanguage ? (
         <div className="text-center py-8 sm:py-12">
           <div className="text-4xl sm:text-6xl mb-4">🌍</div>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
@@ -68,9 +68,9 @@ export default function PromptsPage() {
             </p>
           </div>
         </div>
-      ) : (
+      ) : ( */}
         <PromptSelector />
-      )}
+      {/* )} */}
     </AppLayout>
   );
 } 
