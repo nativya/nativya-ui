@@ -3,7 +3,7 @@ import AppLayout from '../components/layout/AppLayout';
 
 export default function GrammarCorrectPage() {
   return (
-    <AppLayout currentTab="tasks">
+    <AppLayout>
       <div className="max-w-2xl mx-auto mt-16 text-center">
         <div className="text-6xl mb-4">✍️</div>
         <h1 className="text-3xl font-bold mb-2 text-blue-700">Correct Grammar</h1>

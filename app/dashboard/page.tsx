@@ -43,7 +43,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <AppLayout currentTab="dashboard">
+    <AppLayout>
       <ContributionsDashboard />
     </AppLayout>
   );
