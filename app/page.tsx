@@ -1,9 +1,10 @@
 // -----------------------------------------------------------------------------
-// Nativya: Data DAO Landing Page
+// Nativya: Data DAO Landing Page (Thematic Hero)
 // File: app/page.tsx
 // Stack: Next.js 15, React 19, TypeScript, Tailwind CSS, Framer Motion
 // Author: Gemini AI
-// Description: Updated with a more dynamic and interactive hero section.
+// Description: Hero section updated with floating, stylized text in multiple
+// languages to better represent the project's mission.
 // -----------------------------------------------------------------------------
 
 "use client";
@@ -15,7 +16,6 @@ import {
   KeyRound,
   Mic,
   Award,
-  Blocks,
   Users,
   Lock,
   Share2,
@@ -29,6 +29,14 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
+import Image from "next/image";
+import Nativya_logo from "@/public/Nativya_logo.jpg";
+// --- MOCKED DEPENDENCIES for Standalone Execution ---
+
+// Mock Login Hook
+const useGoogleLogin = () => {
+  return () => alert("Login functionality would be initiated here.");
+};
 
 // --- Custom Hook for Mouse Position ---
 const useMousePosition = () => {
@@ -40,12 +48,10 @@ const useMousePosition = () => {
       x.set(e.clientX);
       y.set(e.clientY);
     };
-
     window.addEventListener("mousemove", updateMouse);
     return () => window.removeEventListener("mousemove", updateMouse);
   }, [x, y]);
 
-  // Use spring for smoother motion
   const springConfig = { damping: 25, stiffness: 200, mass: 0.5 };
   const springX = useSpring(x, springConfig);
   const springY = useSpring(y, springConfig);
@@ -108,6 +114,7 @@ export default function NativyaLandingPage() {
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const handleLogin = useGoogleLogin();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -128,7 +135,12 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center space-x-3">
-            <Bot className="h-8 w-8 text-blue-500" />
+            <Image
+              src={Nativya_logo}
+              alt="Nativya Logo"
+              width={40}
+              height={40}
+            />
             <span className="text-2xl font-bold text-slate-900">Nativya</span>
           </div>
           <nav className="hidden md:flex items-center space-x-8">
@@ -151,12 +163,12 @@ const Header = () => {
               Security
             </a>
           </nav>
-          <a
-            href="#join"
-            className="hidden md:inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-base font-medium rounded-full text-white bg-blue-500 hover:bg-blue-600 transition-all duration-300 transform hover:scale-105"
+          <button
+            onClick={handleLogin}
+            className="hidden md:inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-base font-medium rounded-full text-white bg-blue-500 hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 cursor-pointer"
           >
             Start Contributing
-          </a>
+          </button>
         </div>
       </div>
     </header>
@@ -164,21 +176,41 @@ const Header = () => {
 };
 
 // -----------------------------------------------------------------------------
-// SECTION: HERO (ENHANCED)
+// SECTION: HERO (ENHANCED WITH FLOATING LANGUAGE TEXT)
 // -----------------------------------------------------------------------------
 
 const HeroSection = () => {
   const [stateIndex, setStateIndex] = useState(0);
   const { x, y } = useMousePosition();
+  const handleLogin = useGoogleLogin();
 
-  // Create parallax transformations
-  const rotateX = useTransform(y, [0, window.innerHeight], [5, -5]);
-  const rotateY = useTransform(x, [0, window.innerWidth], [-5, 5]);
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 1200,
+    height: typeof window !== "undefined" ? window.innerHeight : 800,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const rotateX = useTransform(y, [0, windowSize.height], [10, -10]);
+  const rotateY = useTransform(x, [0, windowSize.width], [-10, 10]);
 
   const heroStates = [
-    { type: "text", content: "What did you eat for lunch today?" },
-    { type: "text", content: "आज आपने दोपहर के भोजन में क्या खाया?" },
-    { type: "icon", content: <Blocks className="h-16 w-16 text-blue-400" /> },
+    { type: "text", content: "How are you feeling today?" },
+    { type: "text", content: "आज आप कैसा महसूस कर रहे हैं?" },
+    { type: "text", content: "Comment vous sentez-vous aujourd'hui ?" },
+    { type: "text", content: "今天你感觉怎么样？" },
+    {
+      type: "icon",
+      content: (
+        <Image src={Nativya_logo} alt="Nativya Logo" width={100} height={100} />
+      ),
+    },
     { type: "button", content: "Become a Data Contributor" },
   ];
 
@@ -186,7 +218,6 @@ const HeroSection = () => {
     const interval = setInterval(() => {
       setStateIndex((prevIndex) => (prevIndex + 1) % heroStates.length);
     }, 3000);
-
     return () => clearInterval(interval);
   }, [heroStates.length]);
 
@@ -194,31 +225,66 @@ const HeroSection = () => {
 
   return (
     <section className="relative flex items-center justify-center min-h-screen overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Background Orbs with Parallax */}
+      {/* Background Language Text with Parallax */}
       <motion.div
         className="absolute inset-0 z-0"
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
       >
+        {/* Hindi Text */}
         <motion.div
-          className="absolute top-[10%] left-[10%] w-64 h-64 bg-blue-200 rounded-full opacity-30 filter blur-2xl"
-          animate={{ x: [0, 20, 0], y: [0, -20, 0] }}
+          className="absolute top-[10%] left-[15%] text-8xl font-bold text-slate-400/10"
+          animate={{ x: [0, 10, 0], y: [0, -20, 0] }}
           transition={{
-            duration: 8,
+            duration: 15,
             repeat: Infinity,
             repeatType: "reverse",
             ease: "easeInOut",
           }}
-        />
+        >
+          नमस्ते
+        </motion.div>
+
+        {/* French Text */}
         <motion.div
-          className="absolute bottom-[15%] right-[15%] w-72 h-72 bg-indigo-200 rounded-full opacity-30 filter blur-2xl"
-          animate={{ x: [0, -30, 0], y: [0, 25, 0] }}
+          className="absolute bottom-[15%] left-[5%] text-7xl font-bold text-slate-400/20"
+          animate={{ x: [0, -15, 0], y: [0, 15, 0] }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut",
+          }}
+        >
+          Bonjour
+        </motion.div>
+
+        {/* Chinese Text */}
+        <motion.div
+          className="absolute top-[20%] right-[10%] text-9xl font-bold text-slate-400/10"
+          animate={{ x: [0, 20, 0], y: [0, 10, 0] }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut",
+          }}
+        >
+          你好
+        </motion.div>
+
+        {/* German Text */}
+        <motion.div
+          className="absolute bottom-[10%] right-[15%] text-6xl font-bold text-slate-400/20"
+          animate={{ x: [0, -10, 0], y: [0, -15, 0] }}
           transition={{
             duration: 10,
             repeat: Infinity,
             repeatType: "reverse",
             ease: "easeInOut",
           }}
-        />
+        >
+          Hallo
+        </motion.div>
       </motion.div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -268,9 +334,9 @@ const HeroSection = () => {
                 </div>
               )}
               {currentItem.type === "button" && (
-                <motion.a
-                  href="#join"
-                  className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-xl font-bold rounded-full text-white bg-blue-500 shadow-lg"
+                <motion.button
+                  onClick={handleLogin}
+                  className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-xl font-bold rounded-full text-white bg-blue-500 shadow-lg cursor-pointer"
                   whileHover={{
                     scale: 1.05,
                     boxShadow: "0px 10px 30px -10px rgba(59, 130, 246, 0.5)",
@@ -279,7 +345,7 @@ const HeroSection = () => {
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 >
                   {currentItem.content} <ArrowRight className="ml-3 h-6 w-6" />
-                </motion.a>
+                </motion.button>
               )}
             </motion.div>
           </AnimatePresence>
@@ -288,7 +354,6 @@ const HeroSection = () => {
     </section>
   );
 };
-
 // -----------------------------------------------------------------------------
 // SECTION: MISSION ("What Nativya Is Doing")
 // -----------------------------------------------------------------------------
@@ -337,7 +402,6 @@ const MissionSection = () => {
             everyone, not just a select few.
           </p>
         </AnimatedSection>
-
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {features.map((feature, index) => (
             <motion.div
@@ -408,13 +472,11 @@ const HowItWorksSection = () => {
             A Simple Path to Data Monetization
           </p>
         </AnimatedSection>
-
         <div className="relative mt-16">
           <div
             className="absolute left-1/2 -translate-x-1/2 h-full w-0.5 bg-slate-200 hidden md:block"
             aria-hidden="true"
           ></div>
-
           <div className="space-y-16">
             {steps.map((step, index) => (
               <AnimatedSection key={step.name}>
@@ -487,7 +549,6 @@ const VanaTechSection = () => {
             cryptographic guarantees for a new, user-centric data economy.
           </p>
         </AnimatedSection>
-
         <div className="mt-16 grid gap-10 md:grid-cols-1 lg:grid-cols-3">
           {techPillars.map((pillar, index) => (
             <motion.div
@@ -518,12 +579,12 @@ const VanaTechSection = () => {
 // -----------------------------------------------------------------------------
 
 const CallToActionSection = () => {
+  const handleLogin = useGoogleLogin();
   return (
     <section id="join" className="relative py-20 lg:py-32">
       <div className="absolute inset-0 bg-white" aria-hidden="true">
         <div className="absolute inset-0 bg-slate-50 [mask-image:radial-gradient(farthest-side_at_top,white,transparent)]"></div>
       </div>
-
       <div className="relative max-w-2xl mx-auto text-center px-4">
         <AnimatedSection>
           <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">
@@ -534,8 +595,8 @@ const CallToActionSection = () => {
             data has value. Start your journey with Nativya today.
           </p>
           <motion.a
-            href="#"
-            className="mt-8 inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold rounded-full text-white bg-blue-500 shadow-lg"
+            onClick={handleLogin}
+            className="mt-8 inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold rounded-full text-white bg-blue-500 shadow-lg cursor-pointer"
             whileHover={{
               scale: 1.05,
               boxShadow: "0px 10px 30px -10px rgba(59, 130, 246, 0.5)",
@@ -557,33 +618,79 @@ const CallToActionSection = () => {
 // -----------------------------------------------------------------------------
 const Footer = () => {
   return (
-    <footer className="bg-slate-900 text-slate-400">
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center space-y-8 md:space-y-0">
-          <div className="flex items-center space-x-3">
-            <Bot className="h-7 w-7 text-blue-400" />
-            <span className="text-xl font-bold text-white">Nativya</span>
+    <footer className="bg-white border-t border-slate-200 mt-auto">
+      <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-8">
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <div className="flex items-center gap-2.5 text-2xl font-bold text-slate-800">
+              <Image
+                src={Nativya_logo}
+                alt="Nativya Logo"
+                width={32}
+                height={32}
+              />
+              <span>Nativya</span>
+            </div>
+            <div className="text-sm text-slate-600 text-center md:text-left">
+              Building the future of AI with your voice & stories.
+            </div>
           </div>
-          <div className="flex space-x-6">
-            <a href="#" className="hover:text-white transition-colors">
-              Twitter
+          <div className="flex flex-col items-center md:items-end gap-4">
+            <a
+              href="https://datadao.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500"
+            >
+              <span>Join Community</span>
+              <ArrowRight className="w-4 h-4" />
             </a>
-            <a href="#" className="hover:text-white transition-colors">
-              Discord
-            </a>
-            <a href="#" className="hover:text-white transition-colors">
-              Docs
-            </a>
+            <div className="flex gap-4">
+              <a
+                href="https://x.com/nativya_ai"
+                className="text-slate-500 hover:text-indigo-600 transition-colors"
+                aria-label="X (formerly Twitter)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.6.75Zm-1.7 12.95h1.949L5.42 2.15H3.35l7.55 11.55Z" />
+                </svg>
+              </a>
+              <a
+                href="https://github.com/nativya"
+                className="text-slate-500 hover:text-indigo-600 transition-colors"
+                aria-label="GitHub"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
-        <div className="mt-8 text-center text-sm border-t border-slate-800 pt-8">
-          <p>
-            &copy; {new Date().getFullYear()} Nativya Data DAO. All Rights
-            Reserved.
-          </p>
-          <p className="mt-1">
-            Empowering individuals to build a more equitable AI.
-          </p>
+        <div className="max-w-7xl mx-auto pt-8 flex flex-col md:flex-row justify-between items-center border-t border-slate-200 mt-8 text-sm text-slate-500">
+          <div className="mb-2 md:mb-0">
+            © {new Date().getFullYear()} Nativya. All rights reserved.
+          </div>
+          <div className="flex gap-4">
+            <a href="#privacy" className="hover:text-slate-900 hover:underline">
+              Privacy Policy
+            </a>
+            <a href="#terms" className="hover:text-slate-900 hover:underline">
+              Terms of Use
+            </a>
+          </div>
         </div>
       </div>
     </footer>

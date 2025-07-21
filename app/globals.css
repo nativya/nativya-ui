@@ -12,23 +12,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Dark mode support */
-.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-}
-
-/* Ensure smooth transitions for dark mode */
+/* Ensure smooth transitions for color changes */
 * {
   transition: background-color 0.3s ease, color 0.3s ease,
     border-color 0.3s ease;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
