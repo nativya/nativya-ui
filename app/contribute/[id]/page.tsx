@@ -84,7 +84,7 @@ export default function ContributePage({ params }: ContributePageProps) {
 
   return (
     // The AppLayout provides the base theme.
-    <AppLayout currentTab="tasks">
+    <AppLayout>
       <div className="max-w-3xl mx-auto">
         <BackButton onBack={handleBackToPrompts} />
         <DataContribution prompt={prompt} />

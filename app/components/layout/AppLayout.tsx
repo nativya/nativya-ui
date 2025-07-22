@@ -11,11 +11,10 @@ import { useAccount } from 'wagmi';
 
 interface AppLayoutProps {
   children: ReactNode;
-  currentTab?: string;
 }
 
-export default function AppLayout({ children, currentTab }: AppLayoutProps) {
-  const { address} = useAccount();
+export default function AppLayout({ children }: AppLayoutProps) {
+  const { address } = useWallet();
   return (
     // UPDATED: Clean, light background for the entire app
     <div className="min-h-screen bg-slate-50 flex flex-col">
