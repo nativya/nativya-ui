@@ -1,12 +1,3 @@
-// -----------------------------------------------------------------------------
-// Nativya: Data DAO Landing Page (Thematic Hero)
-// File: app/page.tsx
-// Stack: Next.js 15, React 19, TypeScript, Tailwind CSS, Framer Motion
-// Author: Gemini AI
-// Description: Hero section updated with floating, stylized text in multiple
-// languages to better represent the project's mission.
-// -----------------------------------------------------------------------------
-
 "use client";
 
 import React, { useState, useEffect, useRef, FC, ReactNode } from "react";
@@ -31,12 +22,13 @@ import {
 } from "framer-motion";
 import Image from "next/image";
 import Nativya_logo from "@/public/Nativya_logo.jpg";
+import { useGoogleLogin } from "@/app/components/login/useGoogleLogin";
 // --- MOCKED DEPENDENCIES for Standalone Execution ---
 
 // Mock Login Hook
-const useGoogleLogin = () => {
-  return () => alert("Login functionality would be initiated here.");
-};
+// const useGoogleLogin = () => {
+//   return () => alert("Login functionality would be initiated here.");
+// };
 
 // --- Custom Hook for Mouse Position ---
 const useMousePosition = () => {
