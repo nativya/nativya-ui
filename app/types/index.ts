@@ -16,22 +16,6 @@ export interface Prompt {
   examples?: string[];
 }
 
-// export interface DataContribution {
-//   id: string;
-//   languageCode: string;
-//   promptId: string;
-//   textContent?: string;
-//   audioBlob?: Blob | string;
-//   audioUrl?: string;
-//   timestamp: Date;
-//   userId?: string;
-//   metadata: {
-//     // deviceInfo: string;
-//     recordingDuration?: number;
-//     textLength?: number;
-//   };
-// }
-
 export interface AudioData {
   base64: string;
   mimeType: string;
@@ -40,20 +24,58 @@ export interface AudioData {
   duration: number;
 }
 
-export interface DataContribution {
-  id: string;
-  languageCode: string;
-  promptId: string;
-  textContent: string;
-  audioData?: AudioData; // Replace audioBlob with audioData
-  audioUrl?: string;
-  timestamp: Date;
-  userId: string;
-  metadata: {
+// export interface DataContribution {
+//   id: string;
+//   languageCode: string;
+//   promptId: string;
+//   textContent: string;
+//   audioData?: AudioData; // Replace audioBlob with audioData
+//   audioUrl?: string;
+//   timestamp: Date;
+//   userId: string;
+//   metadata: {
+//     recordingDuration?: number;
+//     textLength?: number;
+//   };
+// }
+
+export type ContributionData = {
+  contributionId: string;
+  encryptedUrl: string;
+  transactionReceipt: {
+    hash: string;
+    blockNumber?: number;
+  };
+  fileId?: number;
+  teeProofData?: Record<string, unknown>;
+  teeJobId?: number;
+  rewardTxHash?: string;
+};
+
+export interface Data{
+  languageCode:string;
+  promptId:string;
+  textContent?:string;
+  audioData?:AudioData;
+  timestamp:Date;
+  metadata:{
     recordingDuration?: number;
     textLength?: number;
-  };
+  }
 }
+
+// export type ContributionData = {
+//   contributionId: string;
+//   encryptedUrl: string;
+//   transactionReceipt: {
+//     hash: string;
+//     blockNumber?: number;
+//   };
+//   fileId?: number;
+//   teeProofData?: Record<string, unknown>;
+//   teeJobId?: number;
+//   rewardTxHash?: string;
+// };
 
 export interface UserSession {
   selectedLanguage: Language;

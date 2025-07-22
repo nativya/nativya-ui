@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@tanstack/query-core": "^5.83.0",
+    "@tanstack/react-query": "^5.83.0",
     "@types/eccrypto": "^1.1.6",
     "clsx": "^2.1.1",
     "crypto-js": "^4.2.0",
@@ -26,6 +28,8 @@
     "react-hook-form": "^7.52.1",
     "react-transliterate": "^1.1.9",
     "tailwind-merge": "^2.5.4",
+    "viem": "^2.32.1",
+    "wagmi": "^2.16.0",
     "zustand": "^4.5.7"
   },
   "devDependencies": {

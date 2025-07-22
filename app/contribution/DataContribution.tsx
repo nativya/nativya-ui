@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { AudioData, Prompt } from '../types';
 import { useAppStore } from '../store/useAppStore';
-import { useWallet } from "../lib/auth/useWallet";
 import InputTypeSelector from './ui/InputTypeSelector';
 import AudioRecorder from './ui/AudioRecorder';
 import PromptHeader from './ui/PromptHeader';
@@ -12,6 +11,7 @@ import { useSession } from 'next-auth/react';
 import { useUserData } from '../components/profile/hooks/useUserData';
 import { Language, ReactTransliterate as Transliterate } from 'react-transliterate';
 import 'react-transliterate/dist/index.css';
+import { useAccount } from 'wagmi';
 
 // Helper function to convert blob to base64
 const convertBlobToBase64 = (blob: Blob): Promise<string> => {
@@ -39,7 +39,7 @@ export default function DataContribution({ prompt }: DataContributionProps) {
   const [recordingTime, setRecordingTime] = useState(0);
   // REVERT: isSubmitting is now local state again.
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { address } = useWallet();
+  const { address } = useAccount();
   const { data: session } = useSession();
   const { userInfo, driveInfo } = useUserData();
 
@@ -88,13 +88,13 @@ export default function DataContribution({ prompt }: DataContributionProps) {
       }
 
       await handleContributeData(userInfo, driveInfo, address, {
-        id: `${userInfo.id || "unknown"}_${Date.now()}`,
+        // id: `${userInfo.id || "unknown"}_${Date.now()}`,
         languageCode: currentLanguage?.code || "",
         promptId: prompt.id,
         textContent: inputType === 'text' ? textContent : '',
         audioData: audioData,
         timestamp: new Date(),
-        userId: userInfo.id,
+        // userId: userInfo.id,
         metadata: {
           recordingDuration: inputType === 'audio' ? recordingTime : undefined,
           textLength: inputType === 'text' ? textContent.length : undefined,

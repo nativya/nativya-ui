@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AppState, Language, Prompt, DataContribution } from '../types';
+import { AppState, Language, Prompt, Data } from '../types';
 import { INDIAN_LANGUAGES } from '../data/languages';
 import { DATA_PROMPTS } from '../data/prompts';
 
@@ -12,7 +12,7 @@ interface AppStore extends AppState {
   setIsRecording: (isRecording: boolean) => void;
   // clearContributions: () => void;
   // exportContributions: () => void;
-  getContributionsByLanguage: (languageCode: string) => DataContribution[];
+  getContributionsByLanguage: (languageCode: string) => Data[];
   // getTotalContributions: () => number;
   address: string | null;
   setAddress: (address: string | null) => void;
@@ -116,7 +116,7 @@ export const useAppStore = create<AppStore>()(
         const parsed = JSON.parse(str);
         // Convert date strings back to Date objects
         if (parsed.contributions) {
-          parsed.contributions = parsed.contributions.map((contribution: DataContribution) => ({
+          parsed.contributions = parsed.contributions.map((contribution: Data) => ({
             ...contribution,
             timestamp: new Date(contribution.timestamp)
           }));
