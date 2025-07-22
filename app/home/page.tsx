@@ -76,8 +76,8 @@ export default function HomeTasksPage() {
             <p className="text-xs sm:text-sm text-blue-800">
               💡 <strong>Tip:</strong> Use the language dropdown in the top-right corner to select your preferred language.
             </p>
-          </div>
-        </div>
+      </div>
+    </div>
       ) : (
         <section className="w-full max-w-3xl mx-auto mt-10 mb-8">
           <h1 className="text-3xl font-extrabold text-blue-700 mb-6 flex items-center gap-2">

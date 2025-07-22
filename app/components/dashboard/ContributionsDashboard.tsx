@@ -2,10 +2,10 @@
 import { useEffect, useState } from 'react';
 import { clientSideDecrypt } from '@/app/crypto/utils';
 import { Button } from '../ui/Button'; // Assuming this is a custom styled button
-import { useWallet } from '@/app/lib/auth/useWallet';
 import { AudioData } from '@/app/types';
 // NEW: Importing professional icons from Heroicons
 import { LockClosedIcon, LockOpenIcon, DocumentTextIcon, CheckCircleIcon, ExclamationTriangleIcon, MusicalNoteIcon } from '@heroicons/react/24/outline';
+import { useSignMessage } from 'wagmi';
 
 // Define the type for files fetched from the API
 export interface ContributionFile {
@@ -31,7 +31,7 @@ export default function ContributionsDashboard() {
   const [decrypted, setDecrypted] = useState<Record<string, { blob: Blob; text: string }>>({});
   const [decryptingId, setDecryptingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const { signMessage } = useWallet();
+  const { signMessageAsync, isPending: isSigningMessage } = useSignMessage()  // const { signMessageAsync, isPending: isSigningMessage } = useSignMessage();
   const SIGN_MESSAGE = "Please sign to retrieve your encryption key";
 
   // Fetch contributions on mount
@@ -49,7 +49,7 @@ export default function ContributionsDashboard() {
   async function handleDecrypt(file: ContributionFile) {
     setDecryptingId(file.id);
     try {
-      const signature = await signMessage(SIGN_MESSAGE);
+      const signature = await signMessageAsync({message:SIGN_MESSAGE});
       if (!signature) throw new Error('Signature is required to decrypt.');
       
       const encryptedBlob = new Blob([
