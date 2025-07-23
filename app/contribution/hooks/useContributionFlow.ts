@@ -109,7 +109,7 @@ export function useContributionFlow() {
       });
 
       // Process proof and reward in sequence
-      // await executeProofAndRewardSteps(fileId, encryptedKey, signature);
+      await executeProofAndRewardSteps(fileId, encryptedKey, signature);
       console.log(uploadResult)
       setIsSuccess(true);
     } catch (error) {
@@ -200,7 +200,7 @@ const executeBlockchainRegistrationStep = async (
       );
 
       // Step 4: Process Proof
-      await executeProcessProofStep(proofResult, signature);
+      // await executeProcessProofStep(proofResult, signature);
 
       // Step 5: Claim Reward
       await executeClaimRewardStep(fileId);
