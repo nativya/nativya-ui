@@ -282,9 +282,7 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
                   lang={(currentLanguage?.code as Language) || "hi"}
                   value={textContent}
                   onChangeText={setTextContent}
-                  placeholder={`Type your response in ${
-                    currentLanguage?.name
-                  }...`}
+                  placeholder={`Type your response in ${currentLanguage?.name}...`}
                   className="w-full h-40 p-4 border border-slate-300 rounded-lg bg-white text-base resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </motion.div>
@@ -317,21 +315,13 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
   );
 };
 
-// --- Main Page Wrapper ---
-
-// // Define a specific type for the page's props
-// type ContributePageProps = {
-//   params: { id: string };
-// };
-
-// Use the new type for the component's props
-export default function ContributePage({ params }: {  params: { id: string }}) {
+// --- Client Component Wrapper for Params ---
+const ContributePageClient: FC<{ promptId: string }> = ({ promptId }) => {
   const { status } = useSession();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const { currentLanguage, prompts, setCurrentPrompt } = useAppStore();
   const [prompt, setPrompt] = useState<Prompt | null>(null);
-  const promptId = params.id;
 
   useEffect(() => {
     setIsClient(true);
@@ -380,4 +370,15 @@ export default function ContributePage({ params }: {  params: { id: string }}) {
       </div>
     </AppLayout>
   );
+};
+
+// --- Main Page Component with Async Params ---
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function ContributePage({ params }: PageProps) {
+  const { id } = await params;
+
+  return <ContributePageClient promptId={id} />;
 }
