@@ -99,12 +99,17 @@ const SuccessOverlay: FC<{ onContinue: () => void }> = ({ onContinue }) => {
 // --- Main Data Contribution Component ---
 const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
   const { currentLanguage } = useAppStore();
-  const [inputType, setInputType] = useState<"text" | "audio">("audio");
+  const [inputType, setInputType] = useState<"text" | "audio">("text");
   const [textContent, setTextContent] = useState("");
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null
+  );
+  const [recordingInterval, setRecordingInterval] =
+    useState<NodeJS.Timeout | null>(null);
   const { data: session } = useSession();
   const { userInfo, driveInfo } = useUserData();
   const { isSuccess, handleContributeData, resetFlow } = useContributionFlow();
@@ -116,6 +121,88 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
   );
 
   const { isConnected } = useAccount();
+
+  // Audio recording functionality
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100,
+        },
+      });
+
+      const recorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported("audio/webm")
+          ? "audio/webm"
+          : "audio/mp4",
+      });
+
+      const chunks: BlobPart[] = [];
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, {
+          type: recorder.mimeType || "audio/webm",
+        });
+        setAudioBlob(blob);
+        stream.getTracks().forEach((track) => track.stop());
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      setRecordingTime(0);
+
+      // Start recording timer
+      const interval = setInterval(() => {
+        setRecordingTime((prev) => prev + 1);
+      }, 1000);
+      setRecordingInterval(interval);
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+      alert("Unable to access microphone. Please check your permissions.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+      setMediaRecorder(null);
+
+      if (recordingInterval) {
+        clearInterval(recordingInterval);
+        setRecordingInterval(null);
+      }
+    }
+  };
+
+  const handleRecordingToggle = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (recordingInterval) {
+        clearInterval(recordingInterval);
+      }
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+      }
+    };
+  }, [recordingInterval, mediaRecorder, isRecording]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -162,8 +249,13 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
       setAudioBlob(null);
       setIsRecording(false);
       setRecordingTime(0);
+
+      // Stop any ongoing recording
+      if (mediaRecorder && isRecording) {
+        stopRecording();
+      }
     }
-  }, [isSuccess]);
+  }, [isSuccess, mediaRecorder, isRecording]);
 
   const router = useRouter();
   const handleContinue = () => {
@@ -198,17 +290,6 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
           <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-xl">
             <button
               type="button"
-              onClick={() => setInputType("audio")}
-              className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition ${
-                inputType === "audio"
-                  ? "bg-blue-500 text-white shadow"
-                  : "text-slate-600"
-              }`}
-            >
-              <Volume2 className="w-5 h-5" /> Audio
-            </button>
-            <button
-              type="button"
               onClick={() => setInputType("text")}
               className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition ${
                 inputType === "text"
@@ -218,13 +299,46 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
             >
               <Keyboard className="w-5 h-5" /> Text
             </button>
+            <button
+              type="button"
+              onClick={() => setInputType("audio")}
+              className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition ${
+                inputType === "audio"
+                  ? "bg-blue-500 text-white shadow"
+                  : "text-slate-600"
+              }`}
+            >
+              <Volume2 className="w-5 h-5" /> Audio
+            </button>
           </div>
         </div>
 
         {/* Contribution Area */}
         <div className="min-h-[250px] flex flex-col items-center justify-center bg-slate-50 rounded-xl p-6">
           <AnimatePresence mode="wait">
-            {inputType === "audio" ? (
+            {inputType === "text" ? (
+              <motion.div
+                key="text"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full"
+              >
+                <Transliterate
+                  lang={(currentLanguage?.code as Language) || "hi"}
+                  value={textContent}
+                  onChangeText={setTextContent}
+                  placeholder={`Type your response in ${currentLanguage?.name}...`}
+                  renderComponent={(props) => (
+                    <textarea
+                      {...props}
+                      rows={6}
+                      className="w-full p-4 border border-slate-300 rounded-lg bg-white text-base resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 whitespace-pre-wrap break-words"
+                    />
+                  )}
+                />
+              </motion.div>
+            ) : (
               <motion.div
                 key="audio"
                 initial={{ opacity: 0 }}
@@ -247,7 +361,7 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
                   )}
                   <button
                     type="button"
-                    onClick={() => setIsRecording(!isRecording)}
+                    onClick={() => handleRecordingToggle()}
                     className={`relative w-20 h-20 rounded-full flex items-center justify-center text-white transition-colors ${
                       isRecording ? "bg-red-500" : "bg-blue-500"
                     }`}
@@ -265,26 +379,15 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
                 <p className="text-sm text-slate-500 mt-2">
                   {isRecording ? "Recording..." : "Tap to record"}
                 </p>
-                {/* Hidden AudioRecorder component to handle logic */}
-                <div className="hidden">
-                  {/* This is a placeholder for your actual AudioRecorder logic */}
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="text"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full"
-              >
-                <Transliterate
-                  lang={(currentLanguage?.code as Language) || "hi"}
-                  value={textContent}
-                  onChangeText={setTextContent}
-                  placeholder={`Type your response in ${currentLanguage?.name}...`}
-                  className="w-full h-40 p-4 border border-slate-300 rounded-lg bg-white text-base resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                {audioBlob && (
+                  <div className="mt-4 w-full max-w-md">
+                    <audio
+                      controls
+                      src={URL.createObjectURL(audioBlob)}
+                      className="w-full"
+                    />
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
