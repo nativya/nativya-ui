@@ -4,7 +4,6 @@ import "./globals.css";
 import { AuthProvider } from "./provider/AuthProvider";
 import { Providers } from "./providers";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -17,21 +16,25 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Nativya - Regional Language Data Collection",
-  description: "Contribute to the preservation and development of Indian languages through community-driven data collection. Support text and audio contributions in 12+ Indian languages.",
-  keywords: "Indian languages, data collection, regional languages, Bengali, Malayalam, Hindi, Tamil, Telugu, Kannada, Gujarati, Marathi, Punjabi, Odia, Assamese, Urdu",
+  description:
+    "Contribute to the preservation and development of Indian languages through community-driven data collection. Support text and audio contributions in 12+ Indian languages.",
+  keywords:
+    "Indian languages, data collection, regional languages, Bengali, Malayalam, Hindi, Tamil, Telugu, Kannada, Gujarati, Marathi, Punjabi, Odia, Assamese, Urdu",
   authors: [{ name: "Nativya Team" }],
   viewport: "width=device-width, initial-scale=1",
   robots: "index, follow",
   openGraph: {
     title: "Nativya - Regional Language Data Collection",
-    description: "Contribute to the preservation and development of Indian languages through community-driven data collection.",
+    description:
+      "Contribute to the preservation and development of Indian languages through community-driven data collection.",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
     title: "Nativya - Regional Language Data Collection",
-    description: "Contribute to the preservation and development of Indian languages through community-driven data collection.",
+    description:
+      "Contribute to the preservation and development of Indian languages through community-driven data collection.",
   },
 };
 
@@ -50,9 +53,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Nativya" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col scroll-smooth`}
       >
-          <AuthProvider>
+         <AuthProvider>
           <Providers>{children}</Providers>
         </AuthProvider>
       </body>
