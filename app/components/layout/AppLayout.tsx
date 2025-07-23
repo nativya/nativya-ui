@@ -3,6 +3,7 @@
 import { ReactNode } from 'react';
 import Navigation from '../navigation/Navigation';
 import Image from 'next/image';
+// import { useWallet } from '../../lib/auth/useWallet';
 import WalletConnector from '../../contribution/utils/WalletConnector';
 // NEW: Importing icons for a professional look
 import { LockClosedIcon, InformationCircleIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
@@ -10,11 +11,11 @@ import { useAccount } from 'wagmi';
 
 interface AppLayoutProps {
   children: ReactNode;
+  currentTab?: string;
 }
 
-export default function AppLayout({ children }: AppLayoutProps) {
-  // const { address } = useWallet();
-  const {address}=useAccount()
+export default function AppLayout({ children, currentTab }: AppLayoutProps) {
+  const { address} = useAccount();
   return (
     // UPDATED: Clean, light background for the entire app
     <div className="min-h-screen bg-slate-50 flex flex-col">

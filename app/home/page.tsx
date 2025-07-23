@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import AppLayout from '../components/layout/AppLayout';
 import Link from 'next/link';
 import { useAppStore } from '../store/useAppStore';
@@ -61,7 +62,7 @@ export default function HomeTasksPage() {
   }
 
   return (
-    <AppLayout>
+    <AppLayout currentTab="tasks">
       {!currentLanguage ? (
         <div className="text-center py-8 sm:py-12">
           <div className="text-4xl sm:text-6xl mb-4">🌍</div>

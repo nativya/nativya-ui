@@ -226,17 +226,17 @@ export const useTeeProof = () => {
       // }
       requestBody.encryption_key = signature;
 
-      // Make direct request to the TEE's RunProof endpoint
-      const contributionProofResponse = await fetch(
-        `${jobDetails.teeUrl}/RunProof`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
+      // Make request to the TEE's RunProof endpoint via backend proxy
+      const contributionProofResponse = await fetch("/api/tee-proxy", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          teeUrl: `${jobDetails.teeUrl}/RunProof`,
+          requestBody,
+        }),
+      });
 
       if (!contributionProofResponse.ok) {
         const errorData = await contributionProofResponse.json();

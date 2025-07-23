@@ -103,7 +103,7 @@ export default function ContributionsDashboard() {
         <div className="text-center py-16 px-6 bg-white border border-slate-200 rounded-lg">
             <DocumentTextIcon className="mx-auto h-12 w-12 text-slate-400" />
             <h3 className="mt-2 text-lg font-semibold text-slate-800">No Contributions Found</h3>
-            <p className="mt-1 text-sm text-slate-600">It looks like you haven&apos;t made any contributions yet.</p>
+            <p className="mt-1 text-sm text-slate-600">It looks like you haven't made any contributions yet.</p>
         </div>
       ) : (
         <ul className="space-y-4">

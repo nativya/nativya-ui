@@ -42,6 +42,7 @@ export function useAddFile() {
 
     try {
       const dataRegistry = DataRegistry();
+      console.log(dataRegistry)
 
       // Send transaction to add file with permissions to DataRegistry
       const hash = await writeContractAsync({

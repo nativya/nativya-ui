@@ -77,17 +77,17 @@ export interface Data{
 //   rewardTxHash?: string;
 // };
 
-export interface UserSession {
-  selectedLanguage: Language;
-  contributions: DataContribution[];
-  totalContributions: number;
-}
+// export interface UserSession {
+//   selectedLanguage: Language;
+//   contributions: DataContribution[];
+//   totalContributions: number;
+// }
 
 export interface AppState {
   currentLanguage: Language | null;
   availableLanguages: Language[];
   prompts: Prompt[];
-  contributions: DataContribution[];
+  contributions: Data[];
   isRecording: boolean;
   currentPrompt: Prompt | null;
 } 

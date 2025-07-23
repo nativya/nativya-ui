@@ -59,7 +59,7 @@ export default function PromptsPage() {
   return (
     // The AppLayout provides the base theme.
     // The `currentTab` prop helps highlight the active tab in the navigation.
-    <AppLayout>
+    <AppLayout currentTab="tasks">
       <PromptSelector />
     </AppLayout>
   );
