@@ -10,8 +10,6 @@ import {
   Languages,
   Camera,
   MicVocal,
-  SpellCheck,
-  Target,
   ArrowRight,
 } from "lucide-react";
 import type { LucideProps } from "lucide-react";
@@ -100,7 +98,7 @@ const WelcomePlaceholder: FC = () => (
     <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-sm">
       <p className="text-sm text-blue-800">
         <span className="font-semibold">💡 Tip:</span> Selecting a language
-        unlocks tasks tailored for you to help improve AI's understanding of it.
+        unlocks tasks tailored for you to help improve AI&apos;s understanding of it.
       </p>
     </div>
   </motion.div>

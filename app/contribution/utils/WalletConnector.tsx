@@ -8,7 +8,7 @@ function truncateAddress(address: string) {
 }
 
 export default function WalletConnector() {
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const { connect, error: connectError, isPending, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const [dropdownOpen, setDropdownOpen] = useState(false);

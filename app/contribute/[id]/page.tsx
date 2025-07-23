@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useEffect, useState, use, FC } from "react";
+import { useEffect, useState, FC } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,7 +21,6 @@ import { useUserData } from "../../components/profile/hooks/useUserData";
 import {
   Mic,
   Square,
-  Check,
   ChevronLeft,
   Lightbulb,
   Keyboard,
@@ -29,6 +28,7 @@ import {
   CheckCircle2,
   PartyPopper,
 } from "lucide-react";
+import { useAccount } from "wagmi";
 
 // --- Helper: Convert Blob to Base64 ---
 const convertBlobToBase64 = (blob: Blob): Promise<string> => {
@@ -42,6 +42,8 @@ const convertBlobToBase64 = (blob: Blob): Promise<string> => {
     reader.readAsDataURL(blob);
   });
 };
+
+
 
 // --- Animated Loading Spinner ---
 const LoadingSpinner: FC = () => (
@@ -119,6 +121,8 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
       (inputType === "audio" && audioBlob && audioBlob.size > 0))
   );
 
+  const {isConnected} = useAccount();
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!session?.user || !userInfo || !driveInfo || !canSubmit) return;
@@ -139,14 +143,14 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
         };
       }
 
-      await handleContributeData(userInfo, driveInfo, null, {
-        id: `${userInfo.id || "unknown"}_${Date.now()}`,
+      await handleContributeData(userInfo, driveInfo, isConnected, {
+        // id: `${userInfo.id || "unknown"}_${Date.now()}`,
         languageCode: currentLanguage?.code || "",
         promptId: prompt.id,
         textContent: inputType === "text" ? textContent : "",
         audioData: audioData,
         timestamp: new Date(),
-        userId: userInfo.id,
+        // userId: userInfo.id,
         metadata: {
           recordingDuration: inputType === "audio" ? recordingTime : undefined,
           textLength: inputType === "text" ? textContent.length : undefined,
@@ -319,8 +323,12 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
   );
 };
 
+interface ContributePageProps {
+  params: { id: string };
+}
+
 // --- Main Page Wrapper ---
-export default function ContributePage({ params }: { params: { id: string } }) {
+export default function ContributePage({ params }: ContributePageProps) {
   const { status } = useSession();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);

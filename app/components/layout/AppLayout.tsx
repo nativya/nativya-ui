@@ -14,7 +14,7 @@ interface AppLayoutProps {
   currentTab?: string;
 }
 
-export default function AppLayout({ children, currentTab }: AppLayoutProps) {
+export default function AppLayout({ children }: AppLayoutProps) {
   const { address} = useAccount();
   return (
     // UPDATED: Clean, light background for the entire app

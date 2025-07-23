@@ -233,7 +233,7 @@ const PromptSelector: FC = () => {
           Welcome Back!
         </h1>
         <p className="text-xl text-slate-500 mt-2">
-          Let's build a more inclusive AI for{" "}
+          Let&apos;s build a more inclusive AI for{" "}
           <span className="font-semibold text-blue-600">
             {currentLanguage.nativeName}
           </span>

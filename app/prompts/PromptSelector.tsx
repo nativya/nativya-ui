@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useEffect, useState, FC, ReactNode } from "react";
+import { useEffect, useState, FC } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";

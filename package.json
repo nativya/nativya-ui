@@ -31,11 +31,11 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.52.1",
     "react-transliterate": "^1.1.9",
-    "tailwind-merge": "^2.6.0",
     "simplex-noise": "^4.0.3",
+    "tailwind-merge": "^2.6.0",
+    "three": "^0.178.0",
     "viem": "^2.32.1",
     "wagmi": "^2.16.0",
-    "three": "^0.178.0",
     "zustand": "^4.5.7"
   },
   "devDependencies": {
@@ -46,6 +46,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
+    "pino-pretty": "^13.0.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef, FC, ReactNode } from "react";
 import {
   ArrowRight,
-  Bot,
   KeyRound,
   Mic,
   Award,
@@ -536,7 +535,7 @@ const VanaTechSection = () => {
             Your Data, Your Rules. Guaranteed by Code.
           </p>
           <p className="mt-4 max-w-3xl mx-auto text-lg text-slate-600">
-            We don't just promise security and ownership; we build on a
+            We don&apos;t just promise security and ownership; we build on a
             foundation that enforces it. The Vana Protocol provides the
             cryptographic guarantees for a new, user-centric data economy.
           </p>
