@@ -39,9 +39,10 @@ export default function DataContribution({ prompt }: DataContributionProps) {
   const [recordingTime, setRecordingTime] = useState(0);
   // REVERT: isSubmitting is now local state again.
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { address } = useAccount();
+  // const { address } = useAccount();
   const { data: session } = useSession();
   const { userInfo, driveInfo } = useUserData();
+  const { isConnected } = useAccount();
 
   const {
     // REVERT: isSubmitting is no longer destructured from the hook.
@@ -87,7 +88,7 @@ export default function DataContribution({ prompt }: DataContributionProps) {
         };
       }
 
-      await handleContributeData(userInfo, driveInfo, address, {
+      await handleContributeData(userInfo, driveInfo, isConnected, {
         // id: `${userInfo.id || "unknown"}_${Date.now()}`,
         languageCode: currentLanguage?.code || "",
         promptId: prompt.id,
