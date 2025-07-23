@@ -1,7 +1,3 @@
-// Contribution Page - A More Beautiful & User-Friendly Redesign
-// File: app/contribute/[id]/page.tsx
-// Description: A unified and redesigned contribution page with a focus on UI/UX, animations, and user-friendliness.
-
 "use client";
 
 import { useEffect, useState, FC } from "react";
@@ -42,8 +38,6 @@ const convertBlobToBase64 = (blob: Blob): Promise<string> => {
     reader.readAsDataURL(blob);
   });
 };
-
-
 
 // --- Animated Loading Spinner ---
 const LoadingSpinner: FC = () => (
@@ -121,7 +115,7 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
       (inputType === "audio" && audioBlob && audioBlob.size > 0))
   );
 
-  const {isConnected} = useAccount();
+  const { isConnected } = useAccount();
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -144,13 +138,11 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
       }
 
       await handleContributeData(userInfo, driveInfo, isConnected, {
-        // id: `${userInfo.id || "unknown"}_${Date.now()}`,
         languageCode: currentLanguage?.code || "",
         promptId: prompt.id,
         textContent: inputType === "text" ? textContent : "",
         audioData: audioData,
         timestamp: new Date(),
-        // userId: userInfo.id,
         metadata: {
           recordingDuration: inputType === "audio" ? recordingTime : undefined,
           textLength: inputType === "text" ? textContent.length : undefined,
@@ -290,7 +282,9 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
                   lang={(currentLanguage?.code as Language) || "hi"}
                   value={textContent}
                   onChangeText={setTextContent}
-                  placeholder={`Type your response in ${currentLanguage?.name}...`}
+                  placeholder={`Type your response in ${
+                    currentLanguage?.name
+                  }...`}
                   className="w-full h-40 p-4 border border-slate-300 rounded-lg bg-white text-base resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </motion.div>
@@ -323,12 +317,15 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
   );
 };
 
-interface ContributePageProps {
-  params: { id: string };
-}
-
 // --- Main Page Wrapper ---
-export default function ContributePage({ params }: ContributePageProps) {
+
+// // Define a specific type for the page's props
+// type ContributePageProps = {
+//   params: { id: string };
+// };
+
+// Use the new type for the component's props
+export default function ContributePage({ params }: {  params: { id: string }}) {
   const { status } = useSession();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
