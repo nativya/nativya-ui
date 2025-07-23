@@ -1,6 +1,3 @@
-// pages/index.tsx (or your tasks page route)
-// Updated with a more dynamic and visually appealing interface
-
 "use client";
 
 import { useEffect, useState } from "react";

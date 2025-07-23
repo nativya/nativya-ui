@@ -3,7 +3,6 @@
 import type { GoogleDriveInfo, GoogleUserInfo } from "@/app/lib/google/googleApi"
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
-// import { toast } from "sonner";
 
 export interface UserDataState {
   userInfo: GoogleUserInfo | null;

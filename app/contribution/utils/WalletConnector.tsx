@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { useWallet } from "../../lib/auth/useWallet";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { Button } from "../../components/ui/Button";
 
 function truncateAddress(address: string) {
@@ -8,22 +8,23 @@ function truncateAddress(address: string) {
 }
 
 export default function WalletConnector() {
-  const { address, connectWallet, setAddress, error } = useWallet();
+  const { address, isConnected } = useAccount();
+  const { connect, error: connectError, isPending, connectors } = useConnect();
+  const { disconnect } = useDisconnect();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleWalletToggle = async () => {
-    try {
-      if (!address) {
-        await connectWallet();
+  const handleWalletToggle = () => {
+    if (!address && connectors.length > 0) {
+      const connector = connectors[0];
+      if (connector) {
+        connect({ connector });
       }
-    } catch (error) {
-      console.error("Wallet operation failed:", error);
     }
   };
 
   const handleDisconnect = () => {
-    setAddress(null);
+    disconnect();
     setDropdownOpen(false);
   };
 
@@ -78,12 +79,13 @@ export default function WalletConnector() {
           onClick={handleWalletToggle}
           size="sm"
           className="px-3 py-1.5 text-xs"
+          disabled={isPending}
         >
-          Connect Wallet
+          {isPending ? "Connecting..." : "Connect Wallet"}
         </Button>
       )}
-      {error && (
-        <span className="ml-2 text-xs text-red-600">{error}</span>
+      {(connectError) && (
+        <span className="ml-2 text-xs text-red-600">{connectError.message}</span>
       )}
     </div>
   );
