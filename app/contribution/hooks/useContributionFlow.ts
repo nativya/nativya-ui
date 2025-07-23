@@ -109,7 +109,7 @@ export function useContributionFlow() {
       });
 
       // Process proof and reward in sequence
-      await executeProofAndRewardSteps(fileId, encryptedKey, signature);
+      // await executeProofAndRewardSteps(fileId, encryptedKey, signature);
       console.log(uploadResult)
       setIsSuccess(true);
     } catch (error) {
