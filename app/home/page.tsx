@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import AppLayout from "../components/layout/AppLayout";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAppStore } from "../store/useAppStore";
 import { motion } from "framer-motion";
 import {
@@ -79,15 +81,18 @@ const WelcomePlaceholder: FC = () => (
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-        className="absolute w-40 h-40 border-2 border-dashed border-blue-200 rounded-full"
+        className="absolute w-40 h-40 border-2 border-dashed border-blue-200 rounded-full z-0"
       />
       <motion.div
         animate={{ rotate: -360 }}
         transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-        className="absolute w-56 h-56 border border-dashed border-slate-200 rounded-full"
+        className="absolute w-56 h-56 border border-dashed border-slate-200 rounded-full z-0"
       />
-      <Languages className="w-20 h-20 text-blue-500" strokeWidth={1.5} />
+      <div className="relative z-10 p-4 bg-white rounded-full">
+        <Languages className="w-20 h-20 text-blue-500" strokeWidth={1.5} />
+      </div>
     </div>
+
     <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-3">
       Welcome to Nativya
     </h2>
@@ -98,7 +103,8 @@ const WelcomePlaceholder: FC = () => (
     <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-sm">
       <p className="text-sm text-blue-800">
         <span className="font-semibold">💡 Tip:</span> Selecting a language
-        unlocks tasks tailored for you to help improve AI&apos;s understanding of it.
+        unlocks tasks tailored for you to help improve AI&apos;s understanding
+        of it.
       </p>
     </div>
   </motion.div>
@@ -149,15 +155,22 @@ const TaskCard: FC<{ task: Task }> = ({ task }) => (
 export default function HomeTasksPage() {
   const { currentLanguage } = useAppStore();
   const [isClient, setIsClient] = useState(false);
-
+  const { status } = useSession();
+  const router = useRouter();
   useEffect(() => {
     setIsClient(true);
   }, []);
+useEffect(() => {
+    if (isClient && status === "unauthenticated") {
+      router.push("/");
+    }
+  }, [isClient, status, router]);
 
   // Prevents hydration mismatch by ensuring this component only renders on the client
-  if (!isClient) {
+  if (!isClient || status === "loading") {
     return null;
   }
+
 
   return (
     <AppLayout>

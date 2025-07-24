@@ -433,7 +433,7 @@ const HowItWorksSection = () => {
     {
       name: "Sign Up & Create Your Data Vault",
       description:
-        "Quickly create an account. This generates your personal, encrypted Data Vault on the Vana Network, which only you can control with your private key.",
+        "Quickly create an account. This generates your personal, encrypted Data Vault on the Vana Network, which only you can control.",
     },
     {
       name: "Respond to Prompts",
@@ -448,7 +448,7 @@ const HowItWorksSection = () => {
     {
       name: "Get Rewarded",
       description:
-        "When companies or researchers license your data through the DAO, you receive direct payment in tokens to your wallet. The entire process is transparent on-chain.",
+        "When you contribute your data, you're instantly rewarded with tokens sent directly to your wallet — all transparently recorded on-chain.",
     },
   ];
 
