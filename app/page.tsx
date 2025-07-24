@@ -441,9 +441,9 @@ const HowItWorksSection = () => {
         "Browse available data requests and contribute by answering prompts in your language. The more you contribute, the more valuable your vault becomes.",
     },
     {
-      name: "Data is Secured on IPFS",
+      name: "Data is Secured on Your Drive",
       description:
-        "Your encrypted contributions are pinned to the InterPlanetary File System (IPFS), a decentralized network, ensuring it is tamper-proof and not controlled by any single entity.",
+        "Your encrypted contributions are stored in Google drive, ensuring it is user-owned and not controlled by anyone else.",
     },
     {
       name: "Get Rewarded",
@@ -514,7 +514,7 @@ const VanaTechSection = () => {
       icon: <Share2 className="h-8 w-8 text-blue-500" />,
       title: "Decentralized & Secure",
       description:
-        "We use IPFS for storage, eliminating central points of failure. Your encrypted data lives on a distributed network, making it resilient to censorship and attacks.",
+        "We use Google Drive for storage, ensuring data ownership. Your encrypted data lives on a distributed network, making it resilient to censorship and attacks.",
     },
     {
       icon: <Users className="h-8 w-8 text-blue-500" />,
