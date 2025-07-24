@@ -628,7 +628,7 @@ const Footer = () => {
           </div>
           <div className="flex flex-col items-center md:items-end gap-4">
             <a
-              href="https://datadao.ai"
+              href="https://docs.google.com/forms/d/e/1FAIpQLSe1ApptW-G-oeDC6xdHN2zkvtPkAYz9NlZl0GmqMUFlCMwgUQ/viewform?usp=sharing&ouid=112131910906559618893"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500"
