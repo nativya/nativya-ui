@@ -1,11 +1,23 @@
 import { Language } from '../types';
 
 export const INDIAN_LANGUAGES: Language[] = [
-  {
+   {
     code: 'hi',
     name: 'Hindi',
     nativeName: 'हिन्दी',
     flag: '🇮🇳'
+  },
+    {
+    code: 'id',
+    name: 'Indonesian',
+    nativeName: 'Bahasa Indonesia',
+    flag: '🇮🇩'
+  },
+    {
+    code: 'fr',
+    name: 'French',
+    nativeName: 'Français',
+    flag: '🇫🇷'
   },
   {
     code: 'bn',
@@ -61,17 +73,38 @@ export const INDIAN_LANGUAGES: Language[] = [
     nativeName: 'ଓଡ଼ିଆ',
     flag: '🇮🇳'
   },
-  // {
-  //   code: 'as',
-  //   name: 'Assamese',
-  //   nativeName: 'অসমীয়া',
-  //   flag: '🇮🇳'
-  // },
   {
     code: 'ur',
     name: 'Urdu',
     nativeName: 'اردو',
-    flag: '🇮🇳'
+    flag: '🇵🇰'
+  },
+
+  // Global languages
+
+  {
+    code: 'sw',
+    name: 'Swahili',
+    nativeName: 'Kiswahili',
+    flag: '🌍'
+  },
+  {
+    code: 'yo',
+    name: 'Yoruba',
+    nativeName: 'Yorùbá',
+    flag: '🇳🇬'
+  },
+  {
+    code: 'ha',
+    name: 'Hausa',
+    nativeName: 'Hausa',
+    flag: '🇳🇬'
+  },
+  {
+    code: 'ig',
+    name: 'Igbo',
+    nativeName: 'Asụsụ Igbo',
+    flag: '🇳🇬'
   }
 ];
 
