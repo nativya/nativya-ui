@@ -228,10 +228,10 @@ export const useTeeProof = () => {
 
       // Make request to the TEE's RunProof endpoint via backend proxy
       const contributionProofResponse = await fetch("/api/tee-proxy", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
         body: JSON.stringify({
           teeUrl: `${jobDetails.teeUrl}/RunProof`,
           requestBody,

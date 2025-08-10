@@ -320,7 +320,7 @@ export default function PromptsPage() {
   const { status } = useSession();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
-  const { currentPrompt } = useAppStore();
+  // const { currentPrompt } = useAppStore();
 
   useEffect(() => {
     setIsClient(true);
@@ -328,9 +328,9 @@ export default function PromptsPage() {
   useEffect(() => {
     if (isClient && status === "unauthenticated") router.push("/");
   }, [status, router, isClient]);
-  useEffect(() => {
-    if (currentPrompt) router.push(`/contribute/${currentPrompt.id}`);
-  }, [currentPrompt, router]);
+  // useEffect(() => {
+  //   if (currentPrompt) router.push(`/contribute/${currentPrompt.id}`);
+  // }, [currentPrompt, router]);
 
   if (status === "loading" || !isClient) {
     return (

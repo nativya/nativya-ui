@@ -2,19 +2,19 @@ import { UploadResponse } from "@/app/lib/google/googleService";
 import { useState } from "react";
 import {  ContributionData, Data, DriveInfo, UserInfo } from "../../types";
 import { useAddFile } from "./useAddFIle";
-// import { useDataRefinement } from "./useDataRefinement";
+import { useDataRefinement } from "./useDataRefinement";
 import { useDataUpload } from "./useDataUpload";
 import { useRewardClaim } from "./useRewardClaim";
 import {
   getDlpPublicKey,
-  // ProofResult,
+  ProofResult,
   SIGN_MESSAGE,
   useTeeProof,
 } from "./useTeeProof"; 
 import { encryptWithWalletPublicKey } from "@/app/crypto/utils";
 import { extractFileIdFromReceipt } from "../utils/fileUtils";
 import { useSignMessage } from "wagmi";
-
+ 
 // Steps aligned with ContributionSteps component (1-based indexing)
 const STEPS = {
   UPLOAD_DATA: 1,
@@ -36,8 +36,9 @@ export function useContributionFlow() {
   const { uploadData, isUploading } = useDataUpload();
   const { addFile, isAdding, contractError } = useAddFile();
   const {  isProcessing } = useTeeProof();
-  const { isClaiming } = useRewardClaim();
-  // const { refine, isLoading: isRefining } = useDataRefinement();
+  const { isClaiming ,requestReward} = useRewardClaim();
+  const { requestContributionProof} = useTeeProof();
+  const { refine, isLoading: isRefining } = useDataRefinement();
 
   // const SIGN_MESSAGE = "Please sign to retrieve your encryption key";
 
@@ -62,7 +63,6 @@ export function useContributionFlow() {
     userInfo: UserInfo,
     driveInfo: DriveInfo,
     isConnected: boolean,
-    // address:string|null,
     contributionData:Data
   ) => {
     console.log("Inside Handle Contribute Data")
@@ -91,7 +91,7 @@ export function useContributionFlow() {
         return;
       }
 
-      const { fileId, txReceipt } =
+      const { fileId, txReceipt, encryptedKey } =
         await executeBlockchainRegistrationStep(uploadResult, signature);
       if (!fileId) return;
 
@@ -109,7 +109,7 @@ export function useContributionFlow() {
       });
 
       // Process proof and reward in sequence
-      // await executeProofAndRewardSteps(fileId, encryptedKey, signature);
+      await executeProofAndRewardSteps(fileId, encryptedKey, signature);
       console.log(uploadResult)
       setIsSuccess(true);
     } catch (error) {
@@ -181,103 +181,103 @@ const executeBlockchainRegistrationStep = async (
     const fileId = extractFileIdFromReceipt(txReceipt);
     markStepComplete(STEPS.BLOCKCHAIN_REGISTRATION);
 
-    return { fileId, txReceipt };
+    return { fileId, txReceipt ,encryptedKey};
 };
 
 
-  // // Steps 3-5: TEE Proof and Reward
-  // const executeProofAndRewardSteps = async (
-  //   fileId: number,
-  //   encryptedKey: string,
-  //   signature: string
-  // ) => {
-  //   try {
-  //     // Step 3: Request TEE Proof
-  //     const proofResult = await executeTeeProofStep(
-  //       fileId,
-  //       encryptedKey,
-  //       signature
-  //     );
+  // Steps 3-5: TEE Proof and Reward
+  const executeProofAndRewardSteps = async (
+    fileId: number,
+    encryptedKey: string,
+    signature: string
+  ) => {
+    try {
+      // Step 3: Request TEE Proof
+      const proofResult = await executeTeeProofStep(
+        fileId,
+        encryptedKey,
+        signature
+      );
 
-  //     // Step 4: Process Proof
-  //     await executeProcessProofStep(proofResult, signature);
+      // Step 4: Process Proof
+      await executeProcessProofStep(proofResult, signature);
 
-  //     // Step 5: Claim Reward
-  //     await executeClaimRewardStep(fileId);
-  //   } catch (proofErr) {
-  //     console.error("Error in TEE/reward process:", proofErr);
-  //     setError(
-  //       proofErr instanceof Error
-  //         ? proofErr.message
-  //         : "Failed to process TEE proof or claim reward"
-  //     );
-  //   }
-  // };
+      // Step 5: Claim Reward
+      await executeClaimRewardStep(fileId);
+    } catch (proofErr) {
+      console.error("Error in TEE/reward process:", proofErr);
+      setError(
+        proofErr instanceof Error
+          ? proofErr.message
+          : "Failed to process TEE proof or claim reward"
+      );
+    }
+  };
 
-  // // Step 3: Request TEE Proof
-  // const executeTeeProofStep = async (
-  //   fileId: number,
-  //   encryptedKey: string,
-  //   signature: string
-  // ) => {
-  //   setCurrentStep(STEPS.REQUEST_TEE_PROOF);
-  //   const proofResult = await requestContributionProof(
-  //     fileId,
-  //     encryptedKey,
-  //     signature
-  //   );
+  // Step 3: Request TEE Proof
+  const executeTeeProofStep = async (
+    fileId: number,
+    encryptedKey: string,
+    signature: string
+  ) => {
+    setCurrentStep(STEPS.REQUEST_TEE_PROOF);
+    const proofResult = await requestContributionProof(
+      fileId,
+      encryptedKey,
+      signature
+    );
 
-  //   updateContributionData({
-  //     teeJobId: proofResult.jobId,
-  //   });
+    updateContributionData({
+      teeJobId: proofResult.jobId,
+    });
 
-  //   markStepComplete(STEPS.REQUEST_TEE_PROOF);
-  //   return proofResult;
-  // };
+    markStepComplete(STEPS.REQUEST_TEE_PROOF);
+    return proofResult;
+  };
 
-  // // Step 4: Process Proof
-  // const executeProcessProofStep = async (
-  //   proofResult: ProofResult,
-  //   signature: string
-  // ) => {
-  //   setCurrentStep(STEPS.PROCESS_PROOF);
+  // Step 4: Process Proof
+  const executeProcessProofStep = async (
+    proofResult: ProofResult,
+    signature: string
+  ) => {
+    setCurrentStep(STEPS.PROCESS_PROOF);
 
-  //   // Update contribution data with proof data
-  //   updateContributionData({
-  //     teeProofData: proofResult.proofData,
-  //   });
+    // Update contribution data with proof data
+    updateContributionData({
+      teeProofData: proofResult.proofData,
+    });
 
-  //   // Call the data refinement process
-  //   try {
-  //     console.log("Starting data refinement...");
-  //     const refinementResult = await refine({
-  //       file_id: proofResult.fileId,
-  //       encryption_key: signature,
-  //     });
+    // Call the data refinement process
+    try {
+      console.log("Starting data refinement...");
+      const refinementResult = await refine({
+        file_id: proofResult.fileId,
+        encryption_key: signature,
+      });
 
-  //     console.log("Data refinement completed:", refinementResult);
+      console.log("Data refinement completed:", refinementResult);
 
-  //     markStepComplete(STEPS.PROCESS_PROOF);
+      markStepComplete(STEPS.PROCESS_PROOF);
 
-  //     return refinementResult;
-  //   } catch (refineError) {
-  //     console.error("Error during data refinement:", refineError);
-  //     throw refineError;
-  //   }
-  // };
+      return refinementResult;
+    } catch (refineError) {
+      console.error("Error during data refinement:", refineError);
+      throw refineError;
+    }
+  };
 
-  // // Step 5: Claim Reward
-  // const executeClaimRewardStep = async (fileId: number) => {
-  //   setCurrentStep(STEPS.CLAIM_REWARD);
-  //   const rewardResult = await requestReward(fileId);
+  // Step 5: Claim Reward
+  const executeClaimRewardStep = async (fileId: number) => {
+    setCurrentStep(STEPS.CLAIM_REWARD);
+    const rewardResult = await requestReward(fileId);
 
-  //   updateContributionData({
-  //     rewardTxHash: rewardResult?.transactionHash,
-  //   });
+    updateContributionData({
+      rewardTxHash: rewardResult?.transactionHash,
+    });
 
-  //   markStepComplete(STEPS.CLAIM_REWARD);
-  //   return rewardResult;
-  // };
+    markStepComplete(STEPS.CLAIM_REWARD);
+    return rewardResult;
+  };
 
   // Helper functions
   const markStepComplete = (step: number) => {
