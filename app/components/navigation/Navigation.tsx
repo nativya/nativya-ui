@@ -27,6 +27,7 @@ export default function Navigation() {
   // Tabs with href property for better reusability
   const tabs: Tab[] = [
     { id: 'tasks', label: 'Home', icon: 'home', href: '/home' },
+    { id: 'docs', label: 'Docs', icon: 'docs', href: '/docs' },
     { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', href: '/dashboard' }
   ];
 

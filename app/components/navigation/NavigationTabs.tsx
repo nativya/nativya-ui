@@ -1,13 +1,16 @@
 import Link from 'next/link';
 // NEW: Importing both outline and solid icons for different states
-import { HomeIcon as HomeOutline, ChartBarIcon as ChartBarOutline } from '@heroicons/react/24/outline';
-import { HomeIcon as HomeSolid, ChartBarIcon as ChartBarSolid } from '@heroicons/react/24/solid';
+import { HomeIcon as HomeOutline, ChartBarIcon as ChartBarOutline, DocumentTextIcon as DocsOutline } from '@heroicons/react/24/outline';
+import { HomeIcon as HomeSolid, ChartBarIcon as ChartBarSolid, DocumentTextIcon as DocsSolid } from '@heroicons/react/24/solid';
 
 // NEW: Icon component that switches between outline and solid based on active state
 const TabIcon = ({ name, isActive }: { name: string, isActive: boolean }) => {
   const className = `w-5 h-5`;
   if (name === 'home') {
     return isActive ? <HomeSolid className={className} /> : <HomeOutline className={className} />;
+  }
+  if (name === 'docs') {
+    return isActive ? <DocsSolid className={className} /> : <DocsOutline className={className} />;
   }
   if (name === 'dashboard') {
     return isActive ? <ChartBarSolid className={className} /> : <ChartBarOutline className={className} />;
