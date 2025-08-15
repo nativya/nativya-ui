@@ -37,6 +37,7 @@ export default function DataContribution({ prompt }: DataContributionProps) {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string>('');
   const [recordingTime, setRecordingTime] = useState(0);
+  const [uniquenessHashes, setUniquenessHashes] = useState<string[]>([]);
   // REVERT: isSubmitting is now local state again.
   const [isSubmitting, setIsSubmitting] = useState(false);
   // const { address } = useAccount();
@@ -58,6 +59,23 @@ export default function DataContribution({ prompt }: DataContributionProps) {
       }
     };
   }, [audioUrl]);
+
+  useEffect(() => {
+    const fetchHashes = async () => {
+      try {
+        const response = await fetch('/api/hashes');
+        if (!response.ok) {
+          throw new Error('Failed to fetch hashes');
+        }
+        const data = await response.json();
+        setUniquenessHashes(data.hashes || []);
+      } catch (error) {
+        console.error('Error fetching uniqueness hashes:', error);
+      }
+    };
+
+    fetchHashes();
+  }, []);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -88,7 +106,7 @@ export default function DataContribution({ prompt }: DataContributionProps) {
         };
       }
 
-      await handleContributeData(userInfo, driveInfo, isConnected, {
+      await handleContributeData(userInfo, driveInfo, isConnected, uniquenessHashes, {
         // id: `${userInfo.id || "unknown"}_${Date.now()}`,
         languageCode: currentLanguage?.code || "",
         promptId: prompt.id,

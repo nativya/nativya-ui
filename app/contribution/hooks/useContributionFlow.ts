@@ -1,6 +1,6 @@
 import { UploadResponse } from "@/app/lib/google/googleService";
 import { useState } from "react";
-import {  ContributionData, Data, DriveInfo, UserInfo } from "../../types";
+import { ContributionData, Data, DriveInfo, UserInfo } from "../../types";
 import { useAddFile } from "./useAddFIle";
 import { useDataRefinement } from "./useDataRefinement";
 import { useDataUpload } from "./useDataUpload";
@@ -10,11 +10,11 @@ import {
   ProofResult,
   SIGN_MESSAGE,
   useTeeProof,
-} from "./useTeeProof"; 
+} from "./useTeeProof";
 import { encryptWithWalletPublicKey } from "@/app/crypto/utils";
 import { extractFileIdFromReceipt } from "../utils/fileUtils";
 import { useSignMessage } from "wagmi";
- 
+
 // Steps aligned with ContributionSteps component (1-based indexing)
 const STEPS = {
   UPLOAD_DATA: 1,
@@ -32,22 +32,18 @@ export function useContributionFlow() {
   const [contributionData, setContributionData] =
     useState<ContributionData | null>(null);
   const [shareUrl, setShareUrl] = useState<string>("");
-  const { signMessageAsync, isPending: isSigningMessage } = useSignMessage()  // const { signMessageAsync, isPending: isSigningMessage } = useSignMessage();
+  const { signMessageAsync, isPending: isSigningMessage } = useSignMessage(); // const { signMessageAsync, isPending: isSigningMessage } = useSignMessage();
   const { uploadData, isUploading } = useDataUpload();
   const { addFile, isAdding, contractError } = useAddFile();
-  const {  isProcessing } = useTeeProof();
-  const { isClaiming ,requestReward} = useRewardClaim();
-  const { requestContributionProof} = useTeeProof();
+  const { isProcessing } = useTeeProof();
+  const { isClaiming, requestReward } = useRewardClaim();
+  const { requestContributionProof } = useTeeProof();
   const { refine, isLoading: isRefining } = useDataRefinement();
 
   // const SIGN_MESSAGE = "Please sign to retrieve your encryption key";
 
   const isLoading =
-  isUploading ||
-  isAdding ||
-  isProcessing ||
-  isClaiming ||
-  isSigningMessage 
+    isUploading || isAdding || isProcessing || isClaiming || isSigningMessage;
   // isRefining;
 
   const resetFlow = () => {
@@ -63,9 +59,10 @@ export function useContributionFlow() {
     userInfo: UserInfo,
     driveInfo: DriveInfo,
     isConnected: boolean,
-    contributionData:Data
+    uniquenessHashes: string[],
+    contributionData: Data
   ) => {
-    console.log("Inside Handle Contribute Data")
+    console.log("Inside Handle Contribute Data");
     if (!userInfo) {
       setError("Unable to access user information. Please try again.");
       return;
@@ -95,7 +92,7 @@ export function useContributionFlow() {
         await executeBlockchainRegistrationStep(uploadResult, signature);
       if (!fileId) return;
 
-    // Update contribution data with blockchain information
+      // Update contribution data with blockchain information
       updateContributionData({
         contributionId: uploadResult.vanaFileId,
         encryptedUrl: uploadResult.downloadUrl,
@@ -109,8 +106,13 @@ export function useContributionFlow() {
       });
 
       // Process proof and reward in sequence
-      await executeProofAndRewardSteps(fileId, encryptedKey, signature);
-      console.log(uploadResult)
+      await executeProofAndRewardSteps(
+        fileId,
+        encryptedKey,
+        signature,
+        uniquenessHashes
+      );
+      console.log(uploadResult);
       setIsSuccess(true);
     } catch (error) {
       console.error("Error contributing data:", error);
@@ -126,7 +128,7 @@ export function useContributionFlow() {
   const executeSignMessageStep = async (): Promise<string | undefined> => {
     try {
       // We don't update currentStep here since signing happens before the visible flow
-      const signature = await signMessageAsync( {message:SIGN_MESSAGE} );
+      const signature = await signMessageAsync({ message: SIGN_MESSAGE });
       return signature;
     } catch (signError) {
       console.error("Error signing message:", signError);
@@ -143,7 +145,12 @@ export function useContributionFlow() {
     contributionData: Data
   ) => {
     setCurrentStep(STEPS.UPLOAD_DATA);
-    const uploadResult = await uploadData(userInfo, signature, contributionData,driveInfo);
+    const uploadResult = await uploadData(
+      userInfo,
+      signature,
+      contributionData,
+      driveInfo
+    );
     if (!uploadResult) {
       setError("Failed to upload data to Google Drive");
       return null;
@@ -153,8 +160,8 @@ export function useContributionFlow() {
     return uploadResult;
   };
 
-// Step 2: Register on blockchain
-const executeBlockchainRegistrationStep = async (
+  // Step 2: Register on blockchain
+  const executeBlockchainRegistrationStep = async (
     uploadResult: UploadResponse,
     signature: string
   ) => {
@@ -181,22 +188,23 @@ const executeBlockchainRegistrationStep = async (
     const fileId = extractFileIdFromReceipt(txReceipt);
     markStepComplete(STEPS.BLOCKCHAIN_REGISTRATION);
 
-    return { fileId, txReceipt ,encryptedKey};
-};
-
+    return { fileId, txReceipt, encryptedKey };
+  };
 
   // Steps 3-5: TEE Proof and Reward
   const executeProofAndRewardSteps = async (
     fileId: number,
     encryptedKey: string,
-    signature: string
+    signature: string,
+    uniquenessHashes: string[]
   ) => {
     try {
       // Step 3: Request TEE Proof
       const proofResult = await executeTeeProofStep(
         fileId,
         encryptedKey,
-        signature
+        signature,
+        uniquenessHashes
       );
 
       // Step 4: Process Proof
@@ -218,13 +226,15 @@ const executeBlockchainRegistrationStep = async (
   const executeTeeProofStep = async (
     fileId: number,
     encryptedKey: string,
-    signature: string
+    signature: string,
+    uniquenessHashes: string[]
   ) => {
     setCurrentStep(STEPS.REQUEST_TEE_PROOF);
     const proofResult = await requestContributionProof(
       fileId,
       encryptedKey,
-      signature
+      signature,
+      uniquenessHashes
     );
 
     updateContributionData({

@@ -53,6 +53,7 @@ interface ProofRequestBody {
   }[];
   encrypted_encryption_key?: string;
   encryption_key?: string;
+  uniqueness_hashes?: string[];
 }
 
 export const getDlpPublicKey = async (): Promise<string> => {
@@ -149,7 +150,8 @@ export const useTeeProof = () => {
   const requestContributionProof = async (
     fileId: number,
     encryptionKey: string,
-    signature: string
+    signature: string,
+    uniquenessHashes: string[]
   ) => {
     setIsProcessing(true);
     setError(null);
@@ -216,6 +218,7 @@ export const useTeeProof = () => {
             ephemeral_key: ephemeralKeyHex,
           },
         ],
+        uniqueness_hashes: uniquenessHashes,
       };
 
       // If TEE public key is available, add encrypted encryption key
@@ -228,10 +231,10 @@ export const useTeeProof = () => {
 
       // Make request to the TEE's RunProof endpoint via backend proxy
       const contributionProofResponse = await fetch("/api/tee-proxy", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           teeUrl: `${jobDetails.teeUrl}/RunProof`,
           requestBody,
