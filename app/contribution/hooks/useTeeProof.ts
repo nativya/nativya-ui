@@ -42,18 +42,19 @@ interface ProofRequestBody {
   nonce: string;
   proof_url: string;
   encryption_seed: string;
-  env_vars: {
-    GOOGLE_TOKEN?: string;
-  };
-  validate_permissions: {
+  env_vars: Record<string, string>;
+  validate_permissions: Array<{
     address: string;
     public_key: string;
     iv: string;
     ephemeral_key: string;
-  }[];
-  encrypted_encryption_key?: string;
+  }>;
+  uniqueness_hashes: string[];
   encryption_key?: string;
-  uniqueness_hashes?: string[];
+  conversations: Array<{
+    prompt: string;
+    answer: string;
+  }>;
 }
 
 export const getDlpPublicKey = async (): Promise<string> => {
@@ -151,7 +152,8 @@ export const useTeeProof = () => {
     fileId: number,
     encryptionKey: string,
     signature: string,
-    uniquenessHashes: string[]
+    uniquenessHashes: string[],
+    conversations: Array<{ prompt: string; answer: string }>
   ) => {
     setIsProcessing(true);
     setError(null);
@@ -219,7 +221,9 @@ export const useTeeProof = () => {
           },
         ],
         uniqueness_hashes: uniquenessHashes,
+        conversations: conversations,
       };
+      console.log("requestBody", requestBody);
 
       // If TEE public key is available, add encrypted encryption key
       // if (jobDetails.teePublicKey) {
@@ -245,6 +249,7 @@ export const useTeeProof = () => {
         const errorData = await contributionProofResponse.json();
         throw new Error(`TEE request failed: ${JSON.stringify(errorData)}`);
       }
+      console.log("contributionProofResponse", contributionProofResponse);
 
       const proofData = await contributionProofResponse.json();
 

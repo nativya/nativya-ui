@@ -255,7 +255,7 @@ const DataContributionComponent: FC<{ prompt: Prompt }> = ({ prompt }) => {
         stopRecording();
       }
     }
-  }, [isSuccess, mediaRecorder, isRecording]);
+  }, [isSuccess, mediaRecorder, isRecording, stopRecording]);
 
   const router = useRouter();
   const handleContinue = () => {

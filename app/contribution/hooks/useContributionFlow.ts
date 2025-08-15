@@ -14,6 +14,7 @@ import {
 import { encryptWithWalletPublicKey } from "@/app/crypto/utils";
 import { extractFileIdFromReceipt } from "../utils/fileUtils";
 import { useSignMessage } from "wagmi";
+import { useRouter } from "next/navigation";
 
 // Steps aligned with ContributionSteps component (1-based indexing)
 const STEPS = {
@@ -32,6 +33,7 @@ export function useContributionFlow() {
   const [contributionData, setContributionData] =
     useState<ContributionData | null>(null);
   const [shareUrl, setShareUrl] = useState<string>("");
+  const router = useRouter();
   const { signMessageAsync, isPending: isSigningMessage } = useSignMessage(); // const { signMessageAsync, isPending: isSigningMessage } = useSignMessage();
   const { uploadData, isUploading } = useDataUpload();
   const { addFile, isAdding, contractError } = useAddFile();
@@ -43,7 +45,12 @@ export function useContributionFlow() {
   // const SIGN_MESSAGE = "Please sign to retrieve your encryption key";
 
   const isLoading =
-    isUploading || isAdding || isProcessing || isClaiming || isSigningMessage;
+    isUploading ||
+    isAdding ||
+    isProcessing ||
+    isClaiming ||
+    isSigningMessage ||
+    isRefining;
   // isRefining;
 
   const resetFlow = () => {
@@ -59,8 +66,9 @@ export function useContributionFlow() {
     userInfo: UserInfo,
     driveInfo: DriveInfo,
     isConnected: boolean,
-    uniquenessHashes: string[],
-    contributionData: Data
+    contributionData: Data,
+    uniquenessHashes: string[] = [],
+    conversations: Array<{ prompt: string; answer: string }> = []
   ) => {
     console.log("Inside Handle Contribute Data");
     if (!userInfo) {
@@ -74,6 +82,10 @@ export function useContributionFlow() {
       // Execute steps in sequence
       const signature = await executeSignMessageStep();
       if (!signature) return;
+      if (!isConnected) {
+        setError("Wallet connection required to register on blockchain");
+        return;
+      }
 
       const uploadResult = await executeUploadDataStep(
         userInfo,
@@ -82,11 +94,6 @@ export function useContributionFlow() {
         contributionData
       );
       if (!uploadResult) return;
-
-      if (!isConnected) {
-        setError("Wallet connection required to register on blockchain");
-        return;
-      }
 
       const { fileId, txReceipt, encryptedKey } =
         await executeBlockchainRegistrationStep(uploadResult, signature);
@@ -104,16 +111,23 @@ export function useContributionFlow() {
         },
         fileId,
       });
+      console.log("Contribution Data", contributionData);
 
       // Process proof and reward in sequence
       await executeProofAndRewardSteps(
         fileId,
         encryptedKey,
         signature,
-        uniquenessHashes
+        uniquenessHashes,
+        conversations
       );
-      console.log(uploadResult);
+      console.log("Upload Result", uploadResult);
       setIsSuccess(true);
+
+      // Redirect to status page after a brief delay to show success state
+      setTimeout(() => {
+        router.push("/status");
+      }, 2000);
     } catch (error) {
       console.error("Error contributing data:", error);
       setError(
@@ -196,21 +210,26 @@ export function useContributionFlow() {
     fileId: number,
     encryptedKey: string,
     signature: string,
-    uniquenessHashes: string[]
+    uniquenessHashes: string[],
+    conversations: Array<{ prompt: string; answer: string }>
   ) => {
     try {
       // Step 3: Request TEE Proof
+      console.log("inside setp 3:  Request TEE Proof");
       const proofResult = await executeTeeProofStep(
         fileId,
         encryptedKey,
         signature,
-        uniquenessHashes
+        uniquenessHashes,
+        conversations
       );
 
       // Step 4: Process Proof
+      console.log("inside setp 4:  Process Proof");
       await executeProcessProofStep(proofResult, signature);
 
       // Step 5: Claim Reward
+      console.log("inside setp 5:  Claim Reward");
       await executeClaimRewardStep(fileId);
     } catch (proofErr) {
       console.error("Error in TEE/reward process:", proofErr);
@@ -227,14 +246,16 @@ export function useContributionFlow() {
     fileId: number,
     encryptedKey: string,
     signature: string,
-    uniquenessHashes: string[]
+    uniquenessHashes: string[],
+    conversations: Array<{ prompt: string; answer: string }>
   ) => {
     setCurrentStep(STEPS.REQUEST_TEE_PROOF);
     const proofResult = await requestContributionProof(
       fileId,
       encryptedKey,
       signature,
-      uniquenessHashes
+      uniquenessHashes,
+      conversations
     );
 
     updateContributionData({
